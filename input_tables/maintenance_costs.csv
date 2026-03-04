@@ -1,0 +1,73 @@
+input,activity,frequency (years),quantity (tons_ha),biome,cost_ton,Currency,cost_ha,cost_ha_y,year,source
+dolomite,soil correction,5,1,Amazon,242.69,BRL,242.69,48.538,2022,Carlos et al 2022
+limestone transport (mechanical),soil correction,5,0.05,Amazon,171.14,BRL,8.557,1.7114,2022,Carlos et al 2022
+limestone application (mechanical),soil correction,5,0.33,Amazon,173.04,BRL,57.1032,11.42064,2022,Carlos et al 2022
+limestone application (manual),soil correction,5,0.12,Amazon,13.26,BRL,1.5912,0.31824,2022,Carlos et al 2022
+fertilization (mechanical),fertilization,1,0.16,Amazon,214.15,BRL,34.264,34.264,2022,Carlos et al 2022
+fertilization (manual),fertilization,1,0.15,Amazon,13.26,BRL,1.989,1.989,2022,Carlos et al 2022
+00-20-20 fertilizer,fertilization,2,0,Amazon,0,BRL,0,0,2022,Carlos et al 2022
+05-20-20 fertilizer,fertilization,2,0,Amazon,0,BRL,0,0,2022,Carlos et al 2022
+single superphosphate,fertilization,2,0.03,Amazon,1766.03,BRL,52.9809,26.49045,2022,Carlos et al 2022
+potassium chloride,fertilization,2,0.04,Amazon,2317.01,BRL,92.6804,46.3402,2022,Carlos et al 2022
+Urea,fertilization,1,0.05,Amazon,2540.38,BRL,127.019,127.019,2022,Carlos et al 2022
+total,total,1,total,Amazon,total,BRL,618.8747,298.09093,2022,Carlos et al 2022
+dolomite,soil correction,5,2,Caatinga,211.34,BRL,422.68,84.536,2022,Carlos et al 2022
+limestone transport (mechanical),soil correction,5,0.05,Caatinga,171.14,BRL,8.557,1.7114,2022,Carlos et al 2022
+limestone application (mechanical),soil correction,5,0.33,Caatinga,173,BRL,57.09,11.418,2022,Carlos et al 2022
+limestone application (manual),soil correction,5,0.12,Caatinga,13.26,BRL,1.5912,0.31824,2022,Carlos et al 2022
+fertilization (mechanical),fertilization,1,0.16,Caatinga,214.15,BRL,34.264,34.264,2022,Carlos et al 2022
+fertilization (manual),fertilization,1,0.15,Caatinga,33.26,BRL,4.989,4.989,2022,Carlos et al 2022
+00-20-20 fertilizer,fertilization,2,0.2,Caatinga,1780.46,BRL,356.092,178.046,2022,Carlos et al 2022
+05-20-20 fertilizer,fertilization,2,0,Caatinga,0,BRL,0,0,2022,Carlos et al 2022
+single superphosphate,fertilization,2,0,Caatinga,0,BRL,0,0,2022,Carlos et al 2022
+potassium chloride,fertilization,2,0,Caatinga,0,BRL,0,0,2022,Carlos et al 2022
+Urea,fertilization,1,0.04,Caatinga,2195.51,BRL,87.8204,87.8204,2022,Carlos et al 2022
+total,total,1,total,Caatinga,total,BRL,973.0836,403.10304,2022,Carlos et al 2022
+dolomite,soil correction,5,2,Cerrado,150.77,BRL,301.54,60.308,2022,Carlos et al 2022
+limestone transport (mechanical),soil correction,5,0.05,Cerrado,171.14,BRL,8.557,1.7114,2022,Carlos et al 2022
+limestone application (mechanical),soil correction,5,0.33,Cerrado,173.04,BRL,57.1032,11.42064,2022,Carlos et al 2022
+limestone application (manual),soil correction,5,0.12,Cerrado,13.26,BRL,1.5912,0.31824,2022,Carlos et al 2022
+fertilization (mechanical),fertilization,1,0.16,Cerrado,214.15,BRL,34.264,34.264,2022,Carlos et al 2022
+fertilization (manual),fertilization,1,0.15,Cerrado,13.26,BRL,1.989,1.989,2022,Carlos et al 2022
+00-20-20 fertilizer,fertilization,2,0,Cerrado,0,BRL,0,0,2022,Carlos et al 2022
+05-20-20 fertilizer,fertilization,2,0,Cerrado,0,BRL,0,0,2022,Carlos et al 2022
+single superphosphate,fertilization,2,0.2,Cerrado,1494.36,BRL,298.872,149.436,2022,Carlos et al 2022
+potassium chloride,fertilization,2,0.05,Cerrado,2192.2,BRL,109.61,54.805,2022,Carlos et al 2022
+Urea,fertilization,1,0.04,Cerrado,2327.38,BRL,93.0952,93.0952,2022,Carlos et al 2022
+total,total,1,total,Cerrado,total,BRL,906.6216,407.34748,2022,Carlos et al 2022
+dolomite,soil correction,5,1,Atlantic Forest,173,BRL,173,34.6,2022,Carlos et al 2022
+limestone transport (mechanical),soil correction,5,0.05,Atlantic Forest,171.14,BRL,8.557,1.7114,2022,Carlos et al 2022
+limestone application (mechanical),soil correction,5,0.33,Atlantic Forest,173.04,BRL,57.1032,11.42064,2022,Carlos et al 2022
+limestone application (manual),soil correction,5,0.12,Atlantic Forest,13.26,BRL,1.5912,0.31824,2022,Carlos et al 2022
+fertilization (mechanical),fertilization,1,0.16,Atlantic Forest,214.15,BRL,34.264,34.264,2022,Carlos et al 2022
+fertilization (manual),fertilization,1,0.15,Atlantic Forest,13.26,BRL,1.989,1.989,2022,Carlos et al 2022
+00-20-20 fertilizer,fertilization,2,0,Atlantic Forest,0,BRL,0,0,2022,Carlos et al 2022
+05-20-20 fertilizer,fertilization,2,0,Atlantic Forest,0,BRL,0,0,2022,Carlos et al 2022
+single superphosphate,fertilization,2,0.04,Atlantic Forest,1328.28,BRL,53.1312,26.5656,2022,Carlos et al 2022
+potassium chloride,fertilization,2,0.04,Atlantic Forest,2064.38,BRL,82.5752,41.2876,2022,Carlos et al 2022
+Urea,fertilization,1,0.06,Atlantic Forest,2239.92,BRL,134.3952,134.3952,2022,Carlos et al 2022
+total,total,1,total,Atlantic Forest,total,BRL,546.606,286.55168,2022,Carlos et al 2022
+dolomite,soil correction,5,1,Pampa,158.4,BRL,158.4,31.68,2022,Carlos et al 2022
+limestone transport (mechanical),soil correction,5,0.05,Pampa,171.14,BRL,8.557,1.7114,2022,Carlos et al 2022
+limestone application (mechanical),soil correction,5,0.33,Pampa,173.04,BRL,57.1032,11.42064,2022,Carlos et al 2022
+limestone application (manual),soil correction,5,0.12,Pampa,13.26,BRL,1.5912,0.31824,2022,Carlos et al 2022
+fertilization (mechanical),fertilization,1,0.16,Pampa,214.15,BRL,34.264,34.264,2022,Carlos et al 2022
+fertilization (manual),fertilization,1,0.15,Pampa,13.26,BRL,1.989,1.989,2022,Carlos et al 2022
+00-20-20 fertilizer,fertilization,2,0,Pampa,0,BRL,0,0,2022,Carlos et al 2022
+05-20-20 fertilizer,fertilization,2,0.5,Pampa,1870.45,BRL,935.225,467.6125,2022,Carlos et al 2022
+single superphosphate,fertilization,2,0,Pampa,0,BRL,0,0,2022,Carlos et al 2022
+potassium chloride,fertilization,2,0,Pampa,0,BRL,0,0,2022,Carlos et al 2022
+Urea,fertilization,1,0.1,Pampa,1996.73,BRL,199.673,199.673,2022,Carlos et al 2022
+total,total,1,total,Pampa,total,BRL,1396.8024,748.66878,2022,Carlos et al 2022
+dolomite,soil correction,5,1,Pantanal,158.38,BRL,158.38,31.676,2022,Carlos et al 2022
+limestone transport (mechanical),soil correction,5,0.05,Pantanal,171.14,BRL,8.557,1.7114,2022,Carlos et al 2022
+limestone application (mechanical),soil correction,5,0.33,Pantanal,173.04,BRL,57.1032,11.42064,2022,Carlos et al 2022
+limestone application (manual),soil correction,5,0.12,Pantanal,13.26,BRL,1.5912,0.31824,2022,Carlos et al 2022
+fertilization (mechanical),fertilization,1,0.16,Pantanal,214.15,BRL,34.264,34.264,2022,Carlos et al 2022
+fertilization (manual),fertilization,1,0.15,Pantanal,13.26,BRL,1.989,1.989,2022,Carlos et al 2022
+00-20-20 fertilizer,fertilization,2,0,Pantanal,0,BRL,0,0,2022,Carlos et al 2022
+05-20-20 fertilizer,fertilization,2,0,Pantanal,0,BRL,0,0,2022,Carlos et al 2022
+single superphosphate,fertilization,2,0.02,Pantanal,1779.5,BRL,35.59,17.795,2022,Carlos et al 2022
+potassium chloride,fertilization,2,0.06,Pantanal,2137.1,BRL,128.226,64.113,2022,Carlos et al 2022
+Urea,fertilization,1,0.06,Pantanal,2212.5,BRL,132.75,132.75,2022,Carlos et al 2022
+total,total,1,total,Pantanal,total,BRL,558.4504,296.03728,2022,Carlos et al 2022
