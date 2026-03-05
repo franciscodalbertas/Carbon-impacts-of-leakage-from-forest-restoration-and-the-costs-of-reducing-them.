@@ -8,12 +8,12 @@ library(tidyr)
 # results for random projects
 all <- list.files(path = "mitigation_imputs/",pattern = "random_sample_SCC",full.names = T)
 
-cluster_scale <- grep(pattern = "local",x = all,value = T)
+local_scale <- grep(pattern = "local",x = all,value = T)
 biome_scale <- grep(pattern = "biome",x = all,value = T)
 country_scale <- grep(pattern = "country",x = all,value = T)
 
 # read files
-cluster_l <- lapply(cluster_scale,readRDS)
+local_l <- lapply(local_scale,readRDS)
 biome_l <- lapply(biome_scale,readRDS) # mitigation scale is wrong!
 country_l <- lapply(country_scale,readRDS) # mitigation scale is wrong!
 
@@ -21,13 +21,13 @@ country_l <- lapply(country_scale,readRDS) # mitigation scale is wrong!
 # and the results are identical so it is wrong!!
 
 # combine into a single df
-cluster_df <- do.call(rbind,cluster_l)
+local_df <- do.call(rbind,local_l)
 biome_df <- do.call(rbind,biome_l)
 country_df <- do.call(rbind,country_l)
 
 # create ignoring scenario (scale does not matter)
 
-projects_ignoring <- cluster_df %>%
+projects_ignoring <- local_df %>%
   mutate(
     # define the strategy
     mitigation_strategy = "ignoring",
@@ -41,7 +41,7 @@ projects_ignoring <- cluster_df %>%
 
 
 # here scale matter (as there is leakage!)
-projects_no_mitigation_local <- cluster_df %>%
+projects_no_mitigation_local <- local_df %>%
   mutate(
     # leakage is accounted but not mitigated
     leakage_scale = "local",
@@ -105,8 +105,6 @@ projects <- projects %>%
 
 
 # calculate total project costs
-# aqui eh o momento adequado pra fazer as correcoes relacionadas a inflacao etc!!
-# mais pra frente!!!
 
 projects<- projects%>%
   mutate(project_costs = total_restoration_costs_reais_2023+

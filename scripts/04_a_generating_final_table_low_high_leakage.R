@@ -20,23 +20,23 @@ abacus <- grep(pattern = "ABACUS",x = all,value = T)
 # the full final table is only needed for ABACUS. I will only compare country
 # scale results for Verra
 
-cluster_scale <- grep(pattern = "local_scale",x = abacus,value = T)
+local_scale <- grep(pattern = "local_scale",x = abacus,value = T)
 biome_scale <- grep(pattern = "biome_scale",x = abacus,value = T)
 country_scale <- grep(pattern = "country_scale",x = abacus,value = T)
 
 # read files
-cluster_l <- lapply(cluster_scale,readRDS)
+local_l <- lapply(local_scale,readRDS)
 biome_l <- lapply(biome_scale,readRDS) 
 country_l <- lapply(country_scale,readRDS) 
 
 # combine into a single df
-cluster_df <- do.call(rbind,cluster_l)
+local_df <- do.call(rbind,cluster_l)
 biome_df <- do.call(rbind,biome_l)
 country_df <- do.call(rbind,country_l)
 
 
 # create ignoring scenario (scale does not matter)
-projects_ignoring <- cluster_df %>%
+projects_ignoring <- local_df %>%
   mutate(
     # define the strategy
     mitigation_strategy = "ignoring",
@@ -50,7 +50,7 @@ projects_ignoring <- cluster_df %>%
 
 
 # here scale matter (as there is leakage!)
-projects_no_mitigation_local <- cluster_df %>%
+projects_no_mitigation_local <- local_df %>%
   mutate(
     # leakage is accounted but not mitigated
     mitigation_strategy = "no_mitigation",
@@ -80,7 +80,7 @@ projects_no_mitigation_country <- country_df %>%
 
 # combine 
 # this include the ignoring -- as scale does not matter
-projects_local <- rbind(cluster_df,projects_ignoring,projects_no_mitigation_local) 
+projects_local <- rbind(local_df,projects_ignoring,projects_no_mitigation_local) 
 projects_biome <- rbind(biome_df,projects_no_mitigation_biome) 
 projects_country <- rbind(country_df,projects_no_mitigation_country) 
 
@@ -137,46 +137,6 @@ projects<- projects%>%
 
 
 
-# quick check for mitigation scenarios!!
-
-projects %>%
-  filter(approach == "intensification") %>%
-  #group_by(name_biome,yield_carbon_ratio)%>%
-  ggplot(aes(x = yield_carbon_ratio,y=CO2_cost_COC,fill = yield_carbon_ratio)) +
-  geom_violin() +
-  facet_wrap(~name_biome)+
-  scale_y_log10(label= comma) 
-
-projects %>%
-  filter(approach == "intensification") %>%
-  #group_by(name_biome,yield_carbon_ratio)%>%
-  ggplot(aes(x = yield_carbon_ratio,y=CO2_cost_noCOC,fill = yield_carbon_ratio)) +
-  geom_violin() +
-  facet_wrap(~name_biome)+
-  scale_y_log10(label= comma) 
-
-
-projects %>%
-  filter(approach == "ignoring") %>%
-  #group_by(name_biome,yield_carbon_ratio)%>%
-  ggplot(aes(x = yield_carbon_ratio,y=CO2_cost_COC,fill = yield_carbon_ratio)) +
-  geom_violin() +
-  facet_wrap(~name_biome)+
-  scale_y_log10(label= comma) 
-
-
-projects$approach <- factor(projects$approach,
-                  levels = c("ignoring","no_mitigation","intensification"))
-
-projects %>%
-  #filter(approach == "ignoring") %>%
-  #group_by(name_biome,yield_carbon_ratio)%>%
-  ggplot(aes(x = yield_carbon_ratio,y=CO2_cost_COC,fill = yield_carbon_ratio)) +
-  geom_violin() +
-  facet_grid(name_biome~approach,scales = "free")+
-  # free y axis scale
-  scale_y_log10(label= comma)
-
 
 # save
 saveRDS(projects,"output_tables/abacus_high_low_leakage_projects_r10_local_biome_country_scale_prj_yield_SCC_3.rds")
@@ -190,8 +150,6 @@ country_l_verra <- lapply(country_scale_verra,readRDS)
 
 # combine into a single df
 country_df_verra <- do.call(rbind,country_l_verra)
-
-class(country_df_verra)
 
 # create ignoring scenario (scale does not matter)
 
@@ -244,8 +202,6 @@ projects_verra <- projects_country_verra %>%
         approach == "intensification"~net_CO2_no_correction_mitigation),
     # add the carbon balance minus the carbon opportunity costs of restoration
     # from mitigation areas (for the rest there is no forgone OC!)
-    # actually, there should be some forgone OC for the no_mitigation too? for where
-    # it leaked?? think about it!
     final_CO2_balance_corrected_minus_COC =
       case_when(
         approach == "ignoring"~final_CO2_balance_corrected,

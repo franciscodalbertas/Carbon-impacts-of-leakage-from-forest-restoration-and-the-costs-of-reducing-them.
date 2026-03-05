@@ -241,7 +241,7 @@ carbon_optimization <- function(sr_carrying,
   # Add the ID of each project here so I can extract data later!
   
   final_selection_shp <- st_as_sf(final_selection, coords = c("x_mitig","y_mitig"))
-  path <- paste0("mitigation_locations/mitigation_locations_carbon",source_params,"_",mitigation_scale,"_",biome,"_","round11.shp")
+  path <- paste0("mitigation_locations/mitigation_locations_carbon",source_params,"_",mitigation_scale,"_",biome,"_","round1.shp")
   
   if (file.exists(path)) {
     st_write(final_selection_shp, path, append = TRUE)
