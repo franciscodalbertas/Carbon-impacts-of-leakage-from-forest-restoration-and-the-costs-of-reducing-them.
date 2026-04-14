@@ -18,7 +18,7 @@ preprocess_data <- function(path_verra = NULL, path_abacus = NULL) {
   current_yield <- rast("variables/beef_yield_kg_ha_2021_albers_1km.tif")
   
   ## Calculate yield gap to carbon ratio
-  delta_yield_c <- rast("variables/yield_gap_carbon_ratio_albers_1km.tif")
+  delta_yield_c <- rast("variables/yield_gap_carbon_pnr_ratio_albers_1km.tif")
   
   # cap based on 20% and 80% percentiles
   # this creates the NAs -- not sure why I need to cap (to be even with mitigation

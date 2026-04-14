@@ -18,15 +18,14 @@ library(stringi)
 
 source("functions/06_mitigation_scale.R")
 source("functions/04_calculat_mitigation_minimizing_costs.R")
-# run this to do it like before, without using p. nat. reg.
-# run this to incorporate p. nat. reg. and SCC in the calculation of areas to mitigate!
+
 # Carlos et al:
 if(identical(intensification_model, "carlos")){
 source("functions/05_a_calculat_mitigation_carbon_efficiency_with_nat_reg.R")
-  }
+  }else{
 # Wirsenius et al:
 source("functions/05_b_calculat_mitigation_carbon_efficiency_with_nat_reg_stefan_model.R")
-
+}
 source("functions/09_preprocessing_rasters.R")
 
 # ======================= PREPROCESS DATA ============================
@@ -65,16 +64,25 @@ data <- preprocess_data(
 list2env(data, .GlobalEnv)
 
 rate <- 0.08
-years <- 49
+years <- if (identical(intensification_model, "carlos")) 49 else 50
 # change if there's updates in project location
 proj_location <- readRDS("project_location/project_location_round1_sampled100projects.rds")
 immediate_regions <- rast("variables/immediate_regions_r_limits_albers1km.tif")
+
+# change cost input
+
+intensification_costs_input <- if (identical(intensification_model, "carlos")) {
+  intensification_costs
+} else {
+  intensification_costs_stefan
+}
+
 
 input_cluster_scale <- project_scale(
   projects = get(glue("projects_{tolower(source_params)}_cluster")),
   scale = "cluster",
   pot_yield = pot_yield,
-  intensification_costs = intensification_costs_stefan, # here I should add either Stefan or normal cost!
+  intensification_costs = intensification_costs_input, 
   pasture_share = pasture_share,
   maintenance_costs = maintenance_costs,
   rate = rate,

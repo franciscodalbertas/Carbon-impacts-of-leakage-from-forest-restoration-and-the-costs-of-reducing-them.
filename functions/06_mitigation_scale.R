@@ -95,35 +95,29 @@ project_scale <- function(projects,
   
   # need to choose areas with pasture. The amount of carbon associated with pasture areas!
   delta_carbon_pasture <- delta_carbon_m * (pasture_share_m/pasture_share_m)
-  
-  # calculate ratio (if I used delta yield here, need to use delta yield on the selection too!!not the pot_yiel!)
-  #yield_carbon <- delta_yield_m/(delta_carbon_pasture+1)
-  # remove places where delta carbon is zero
-  #yield_carbon <- ifel(yield_carbon==Inf,NA,yield_carbon)
-  
+ 
   # this is also only necessary for carlos
   if(identical(intensification_model, "carlos")){
-  # Create a discount factor
-  discount_factors <- 1 / ((1 + rate) ^ (1:years))
-  
-  # Sum the discount factors to get the NPV factor
-  npv_factor <- sum(discount_factors)
-  
-  # Apply the NPV calculation to the raster
-  maintenance_costs_29y <- maintenance_costs_m * npv_factor
-  
-  # maintenance cost + recovery/reform cost on year 1
-  total_cost_kg_ha <- intensification_costs_m + maintenance_costs_29y
-  # multiply that to 1 AU = 450 kg
-  # this gives the weighted cost... then I can calculate the real cost using 
-  # density and animal performance
-  total_cost_ha <- total_cost_kg_ha * 450
+    # Create a discount factor
+    discount_factors <- 1 / ((1 + rate) ^ (1:years))
+    
+    # Sum the discount factors to get the NPV factor
+    npv_factor <- sum(discount_factors)
+    
+    # Apply the NPV calculation to the raster
+    maintenance_costs_29y <- maintenance_costs_m * npv_factor
+    
+    # maintenance cost + recovery/reform cost on year 1
+    total_cost_kg_ha <- intensification_costs_m + maintenance_costs_29y
+    # multiply that to 1 AU = 450 kg
+    # this gives the weighted cost... then I can calculate the real cost using 
+    # density and animal performance
+    total_cost_ha <- total_cost_kg_ha * 450
+  }else{ 
+    # this has no info. on kg gain!!need to add later!
+    
+    total_cost_ha <- intensification_costs_m
   }
-  
-  # this has no info. on kg gain!!need to add later!
-  total_cost_ha <- intensification_costs_m
-  
-  
   
   # delta production.
   #delta_production <- delta_yield_m * 100 * pasture_share_m

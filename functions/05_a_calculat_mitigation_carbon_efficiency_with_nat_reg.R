@@ -22,7 +22,7 @@ carbon_optimization <- function(sr_carrying,
                           p_n_r
                            ){
   
-  source("scripts/results_calculation_single_projects/02_g_SCC_mitigation_sites.R")
+  source("functions/13_c_SCC_mitigation_sites.R")
   
   
   # transform in a matrix (need to add yield to the extraction)
@@ -70,7 +70,6 @@ carbon_optimization <- function(sr_carrying,
       select(cod_rgi,abbrev_state,DA_uf)%>%
       rename(code_immediate =  cod_rgi) %>%
       ungroup() %>%
-      #left_join(beef_yield_municipality_kg_ha_2021) %>%
       mutate(code_immediate = as.double(code_immediate))
   
     
@@ -83,6 +82,23 @@ carbon_optimization <- function(sr_carrying,
               by = join_by("boundary" ==  "code_immediate"))%>%
     # exclude pixels outside the limits
     filter(!is.na(DA_uf))
+  
+  # keeping only data between the 20th and 80th percentile (at the relevant
+  # scale)
+  
+  if(mitigation_scale =="cluster"){
+    data <- data %>%
+      group_by(boundary) %>%
+      filter(delta_y_c <= quantile(delta_y_c, probs = 0.8))
+    
+  }else{ 
+    top_p <- stats::quantile(data$delta_y_c,0.80,na.rm=T) 
+    data <- data %>%
+      filter(delta_y_c<=top_p)
+    
+  }
+  
+  
   
   # calculte maximum achievable yield at carrying capacity (capped to 90%): 
   
@@ -108,9 +124,7 @@ carbon_optimization <- function(sr_carrying,
   # check the other scrip (cost, as I think the data is not arranged!!)
   
   
-  }
-  
-  else{
+  } else{
     
     # data 1 and 2 should be the same!!
     
@@ -132,31 +146,28 @@ carbon_optimization <- function(sr_carrying,
       density =  current_yield/ DA_uf,
       intensified_density = density +1,
       intensified_yield =  intensified_density * DA_uf,
-      achievable_production_kg = intensified_yield * area_available_ha,
-      # here I replace the production by capping it to the carrying capacity when needed
-      achievable_production_kg = if_else(achievable_production_kg<delta_production_kg,achievable_production_kg,delta_production_kg),
-      # add the reduction on forest recovery as additional production!
-      supp_production_kg = p_n_r * achievable_production_kg,
-      # sum achievable + the supp. with taking p to forest to 0!
-      achievable_production_kg_final = achievable_production_kg + supp_production_kg,
-      cumulative_production_kg = cumsum(achievable_production_kg_final),
-      achievable_yield = achievable_production_kg_final/area_available_ha
+      # cappp yield at carrying
+      intensified_yield =  ifelse(intensified_yield>yield_carrying,yield_carrying,intensified_yield),
+      Y_gained = intensified_yield - current_yield,
+      # Production intensified (P_i): 
+      P_i = area_available_ha *(p_n_r*intensified_yield+((1-p_n_r)*Y_gained)),
+      cumulative_production_kg = cumsum(P_i),
+      
     ) 
   
   data_2 <- data_2 %>%
     mutate(
+      # density by animal performance. 
       density =  current_yield/ DA_uf,
       intensified_density = density +1,
       intensified_yield =  intensified_density * DA_uf,
-      achievable_production_kg = intensified_yield * area_available_ha,
-      # here I replace the production by capping it to the carrying capacity when needed
-      achievable_production_kg = if_else(achievable_production_kg<delta_production_kg,achievable_production_kg,delta_production_kg),
-      # add the reduction on forest recovery as additional production!
-      supp_production_kg = p_n_r * achievable_production_kg,
-      # sum achievable + the supp. with taking p to forest to 0!
-      achievable_production_kg_final = achievable_production_kg + supp_production_kg,
-      cumulative_production_kg = cumsum(achievable_production_kg_final),
-      achievable_yield = achievable_production_kg_final/area_available_ha
+      # cappp yield at carrying
+      intensified_yield =  ifelse(intensified_yield>yield_carrying,yield_carrying,intensified_yield),
+      Y_gained = intensified_yield - current_yield,
+      # Production intensified (P_i): 
+      P_i = area_available_ha *(p_n_r*intensified_yield+((1-p_n_r)*Y_gained)),
+      cumulative_production_kg = cumsum(P_i),
+      
     )
   
   
@@ -186,7 +197,7 @@ carbon_optimization <- function(sr_carrying,
     mutate(cumulative_production_kg = if_else(cumulative_production_kg>target_FP_1,target_FP_1,cumulative_production_kg),
            yield = delta_production_kg/area_available_ha,
            new_target = if_else(row_number() == 1,target_FP_1,target_FP_1 - lag(cumulative_production_kg)),
-           area_required = new_target/achievable_yield,
+           area_required = new_target/intensified_yield,
            area_required = round(if_else(area_required > area_available_ha,area_available_ha,area_required),2),
            yield_carbon_ratio = "max"
     )
@@ -196,7 +207,7 @@ carbon_optimization <- function(sr_carrying,
     mutate(cumulative_production_kg = if_else(cumulative_production_kg>target_FP_2,target_FP_2,cumulative_production_kg),
            yield = delta_production_kg/area_available_ha,
            new_target = if_else(row_number() == 1,target_FP_2,target_FP_2 - lag(cumulative_production_kg)),
-           area_required = new_target/achievable_yield,
+           area_required = new_target/intensified_yield,
            area_required = round(if_else(area_required > area_available_ha,area_available_ha,area_required),2),
            yield_carbon_ratio = "min"
     )
@@ -251,10 +262,7 @@ carbon_optimization <- function(sr_carrying,
   colnames(final_selection2)[ncol(final_selection2)-1] <- "p_n_r"
   # multiply pnr by forgone co2
   final_selection2$forgone_co2_nat_reg <- final_selection2$forgone_co2 * 
-    (1-final_selection2$p_n_r)
-  
-  # Now I need to add the logic of SCC!!(by usin another script??)but this can be done
-  # on the aggregated data
+    final_selection2$p_n_r
   
   # aggregate results to make the combination easier (this should not consider immediate regions for aggregate if the scale is biome)
   
@@ -280,7 +288,7 @@ carbon_optimization <- function(sr_carrying,
     
     
   }
-  # need to define commom id to join! (this causes probelms as there are many rows!)
+  
   project_mitigation <- left_join(st_drop_geometry(final_selection_agg),projects)
   
   project_mitigation$mitigation_strategy <- "optimize_carbon"
@@ -296,12 +304,6 @@ carbon_optimization <- function(sr_carrying,
   # join with the full dataset
   
   project_mitigation2 <- left_join(project_mitigation,SCC%>% select(2,3))
-  
-  # project_mitigation2 %>% group_by(yield_carbon_ratio)%>%
-  #   mutate(disc=100*(1-(forgone_CO2_discounted/ forgone_co2))) %>%
-  #   pull(disc) 
-  
-  
   
   return(project_mitigation2)
 }
