@@ -35,4 +35,16 @@ The `scripts/` directory contains the full pipeline used to generate the results
 
 Below is a description of each script:
 
-- `00_a_defining_project_area_clustered_pixels_sample.R`: select high and low leakage projects
+- `00_a_defining_project_area_clustered_pixels_sample.R`: select high and low leakage projects;
+- `00_b_sampling_random_projects.R`: sample average projects across the full distribution of forgone-production-to-carbon-gained;
+- `01_a_run_project_features_selection_sample_local.R`: generate input data for projects for local domain analysis;
+- `01_b_run_project_features_selection_sample_biome.R`: generate input data for projects for biome domain analysis;
+- `01_c_run_project_features_selection_sample_country.R`: generate input data for projects for country domain analysis;
+- `02_run_SCC_project_features_selection_sample.R`: for the previous generated input data, apply the SCC discounting;
+- `03_a_run_mitigation_costs_selection_sample_local_scale.R`: run mitigation analysis for local domain;
+- `03_b_run_mitigation_costs_selection_sample_biome_scale.R`: run mitigation analysis for biome domain;
+- `03_c_run_mitigation_costs_selection_sample_country_scale.R`: run mitigation analysis for country domain;
+- `04_a_generating_final_table_low_high_leakage.R`: aggregate results for all domains into a single table, for low- and high-leakage projects;
+- `04_b_generating_final_table_random_projects.R`: aggregate results for all domains into a single table, for the projects sampled across the full distribution;
+- `05_adjusting_currency_inflation.R`: adjust final costs converting from BRL to USD;
+- `figures/results`: scripts to generate the figures on the main manuscript;
