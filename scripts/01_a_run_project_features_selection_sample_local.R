@@ -5,8 +5,7 @@ library(sf)
 library(purrr)
 library(furrr)
 
-# calculate leakage consequences for the pool of projects! this need some re-arrangement!
-# fix the function and rename the path!!
+# calculate leakage consequences for the pool of projects
 source("functions/12_run_project_features_sample_projects.R")
 
 #--- high and low projects ---
@@ -46,7 +45,6 @@ saveRDS(result, save_path)
 projects <- readRDS("project_location/project_location_round1_randomsampled100projects.rds")
 
 # add fake yield_carbon_ratio column just to make the function run
-
 projects$yield_carbon_ratio <- "random"
 source_type = "abacus"
 result2 <- run_leakage_analysis(source_type = source_type,leakage_scale = "cluster",

@@ -16,8 +16,7 @@ yield_carbon_ratio_ma <- readRDS("input_tables/clustered_pixels_MA_full_distribu
 # AM
 yield_carbon_ratio_am <- readRDS("input_tables/clustered_pixels_AM_full_distribution.RDS")
 
-# check if there is data for the immediate regions! regarding historical data
-# on ap, yield etc...
+# historical data on ap, yield etc...
 
 ap <- readRDS("input_tables/historical_yield_immediate_regions_2011_2021.rds") %>%
   filter(year == 2021) %>%

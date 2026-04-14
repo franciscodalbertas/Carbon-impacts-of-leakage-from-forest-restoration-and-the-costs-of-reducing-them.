@@ -11,12 +11,12 @@ source("functions/07c_project_selection_clustered_pixels_sample.R")
 # select high and low leakage projects (max, min or high, low)
 
 # open project distributions:
-# AF (entire pool, not capped to 20 - 80)
+# AF 
 yield_carbon_ratio_ma <- readRDS("input_tables/clustered_pixels_MA_full_distribution.RDS")
 # AM
 yield_carbon_ratio_am <- readRDS("input_tables/clustered_pixels_AM_full_distribution.RDS")
 
-# check if there is data for the immediate regions! regarding historical data
+# data for the immediate regions regarding historical data
 # on ap, yield etc...
 
 ap <- readRDS("input_tables/historical_yield_immediate_regions_2011_2021.rds") %>%
@@ -39,7 +39,7 @@ top_lim_ma <-  quantile(yield_carbon_ratio_ma_f$summed_value,0.80,na.rm=T)
 top_lim_am <-  quantile(yield_carbon_ratio_am_f$summed_value,0.80,na.rm=T)
 
 
-# capping the values!
+# capping the values
 yield_carbon_ratio_ma_capped <- yield_carbon_ratio_ma_f %>%
   filter(summed_value>= bottom_lim_ma & summed_value <= top_lim_ma)
 

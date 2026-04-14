@@ -17,9 +17,6 @@ local_l <- lapply(local_scale,readRDS)
 biome_l <- lapply(biome_scale,readRDS) # mitigation scale is wrong!
 country_l <- lapply(country_scale,readRDS) # mitigation scale is wrong!
 
-# it is all showing as cluster!!
-# and the results are identical so it is wrong!!
-
 # combine into a single df
 local_df <- do.call(rbind,local_l)
 biome_df <- do.call(rbind,biome_l)
@@ -79,9 +76,6 @@ projects_country <- projects_no_mitigation_country
 
 projects <- rbind(projects_local,projects_biome,projects_country)
 
-# add column with final carbon balance based on the scenario
-# the problem might be here!!
-#final_CO2_balance 
 
 projects <- projects %>%
   mutate(

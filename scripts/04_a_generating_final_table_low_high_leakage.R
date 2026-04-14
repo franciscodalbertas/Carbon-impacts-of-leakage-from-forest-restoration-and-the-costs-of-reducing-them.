@@ -7,18 +7,14 @@ library(tidyr)
 
 # results for high and low projects
 
-all <- list.files(path = "results/",pattern = "round10",full.names = T)
+all <- list.files(path = "results/",pattern = "round1",full.names = T)
 
 # get it split by verra or abacus
-# verra data seems to be wrong!!
 verra <- grep(pattern = "Verra",x = all,value = T)
 
 abacus <- grep(pattern = "ABACUS",x = all,value = T)
 
 # --- generate single table for abacus ---
-
-# the full final table is only needed for ABACUS. I will only compare country
-# scale results for Verra
 
 local_scale <- grep(pattern = "local_scale",x = abacus,value = T)
 biome_scale <- grep(pattern = "biome_scale",x = abacus,value = T)
@@ -108,10 +104,6 @@ projects <- projects %>%
           approach == "ignoring"~net_CO2_no_correction_mitigation,
           approach == "no_mitigation"~net_CO2_no_correction_no_mitigation,
           approach == "intensification"~net_CO2_no_correction_mitigation),
-   # add the carbon balance minus the carbon opportunity costs of restoration
-   # from mitigation areas (for the rest there is no forgone OC!)
-   # actually, there should be some forgone OC for the no_mitigation too? for where
-   # it leaked?? think about it!
    final_CO2_balance_corrected_minus_COC =
       case_when(
         approach == "ignoring"~final_CO2_balance_corrected,
@@ -139,7 +131,7 @@ projects<- projects%>%
 
 
 # save
-saveRDS(projects,"output_tables/abacus_high_low_leakage_projects_r10_local_biome_country_scale_prj_yield_SCC_3.rds")
+saveRDS(projects,"output_tables/abacus_high_low_leakage_projects_r1_local_biome_country_scale_prj_yield_SCC_3.rds")
 
 # --- generating table for verra ---
 
@@ -226,5 +218,5 @@ projects_verra<- projects_verra%>%
   ungroup()
 
 # save
-saveRDS(projects_verra,"output_tables/verra_high_low_leakage_projects_r10_country_scale_prj_yield_SCC_3.rds")
+saveRDS(projects_verra,"output_tables/verra_high_low_leakage_projects_r1_country_scale_prj_yield_SCC_3.rds")
 
