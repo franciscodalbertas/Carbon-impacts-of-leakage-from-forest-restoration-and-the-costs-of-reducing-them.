@@ -29,3 +29,10 @@ Scripts required to generate the results are located in the scripts/ directory.
 
 These scripts are numbered and ordered sequentially, and should be run in that order to reproduce the output tables used in the manuscript.
 
+## Scripts
+
+The `scripts/` directory contains the full pipeline used to generate the results presented in the manuscript. Scripts are numbered and should be run sequentially.
+
+Below is a description of each script:
+
+- `00_a_defining_project_area_clustered_pixels_sample.R`: select high and low leakage projects
