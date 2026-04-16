@@ -38,8 +38,7 @@ The `scripts/` directory contains the full pipeline used to generate the results
 
 Below is a description of each script:
 
-- `00_a_defining_project_area_clustered_pixels_sample.R`: select high and low leakage projects;
-- `00_b_sampling_random_projects.R`: sample average projects across the full distribution of forgone-production-to-carbon-gained;
+
 - `01_a_run_project_features_selection_sample_local.R`: generate input data for projects for local domain analysis;
 - `01_b_run_project_features_selection_sample_biome.R`: generate input data for projects for biome domain analysis;
 - `01_c_run_project_features_selection_sample_country.R`: generate input data for projects for country domain analysis;
