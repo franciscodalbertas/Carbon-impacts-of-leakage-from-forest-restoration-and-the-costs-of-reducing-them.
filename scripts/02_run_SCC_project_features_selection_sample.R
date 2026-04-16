@@ -3,7 +3,7 @@
 #-------------------------------------------------------------------------------
 
 # running for cluster scale
-scale <- c("local") # run for multiple scales (options: "local","biome","country")
+scale <- c("biome") # run for multiple scales (options: "local","biome","country")
 
 source_to_read <- "abacus" # "abacus" or "verra" or "both"
 

@@ -6,7 +6,7 @@ library(tidyr)
 #-------------------------------------------------------------------------------
 
 # results for random projects
-all <- list.files(path = "mitigation_imputs/",pattern = "random_sample_SCC",full.names = T)
+all <- list.files(path = "mitigation_inputs/",pattern = "random_sample_SCC",full.names = T)
 
 local_scale <- grep(pattern = "local",x = all,value = T)
 biome_scale <- grep(pattern = "biome",x = all,value = T)

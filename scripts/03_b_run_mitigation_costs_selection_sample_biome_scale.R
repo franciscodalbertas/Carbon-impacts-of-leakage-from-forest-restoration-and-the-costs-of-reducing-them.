@@ -17,5 +17,5 @@ intensification_name <- "wirsenius" # Wirsenius was used for the central analysi
 # sensitivity analysis with "carlos"
 
 # run mitigation cost calculation
-source("functions/14_a_calculating_mitigation_costs_imediate_region_project_sample_modular.R")
+source("functions/14_b_calculating_mitigation_costs_biome_project_sample_modular.R")
 

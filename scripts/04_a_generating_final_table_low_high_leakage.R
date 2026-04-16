@@ -7,7 +7,7 @@ library(tidyr)
 
 # results for high and low projects
 
-all <- list.files(path = "results/",pattern = "round1",full.names = T)
+all <- list.files(path = "results_with_mitigation/",pattern = "round1",full.names = T)
 
 # get it split by verra or abacus
 verra <- grep(pattern = "Verra",x = all,value = T)
@@ -26,7 +26,7 @@ biome_l <- lapply(biome_scale,readRDS)
 country_l <- lapply(country_scale,readRDS) 
 
 # combine into a single df
-local_df <- do.call(rbind,cluster_l)
+local_df <- do.call(rbind,local_l)
 biome_df <- do.call(rbind,biome_l)
 country_df <- do.call(rbind,country_l)
 

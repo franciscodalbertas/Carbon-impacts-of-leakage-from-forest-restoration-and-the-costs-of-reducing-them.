@@ -1,11 +1,11 @@
 # read results high and low projects
 
-df <- readRDS("output_tables/stefan_results/abacus_high_low_leakage_projects_r1_local_biome_country_scale_prj_yield_SCC_3.rds")
+df <- readRDS("output_tables/abacus_high_low_leakage_projects_r1_local_biome_country_scale_prj_yield_SCC_3.rds")
 
 
 df_random <- readRDS("output_tables/abacus_random_projects_local_biome_country_scale_prj_yield_SCC_3.rds")
 
-df_verra <- readRDS("output_tables/stefan_results/verra_high_low_leakage_projects_r1_country_scale_prj_yield_SCC_3.rds")
+df_verra <- readRDS("output_tables/verra_high_low_leakage_projects_r1_country_scale_prj_yield_SCC_3.rds")
 
 IPCA_2021 <- 1.0579
 IPCA_2024 <- 1.1583
@@ -46,7 +46,7 @@ df_random <- df_random %>%
     total_land_value_USD_2021 = total_land_value_reais_ha/IPCA_2023, 
     total_restoration_costs_USD_2021 = total_restoration_costs_reais_2023/IPCA_2024,
     # convert to USD
-    mitigation_costs_USD_50y_2021 =  mitigation_costs_reais_50y/USD_rate_2021,
+    mitigation_costs_USD_50y_2021 =  mitigation_costs_reais_50y/USD_BRL_Stefan,
     total_restoration_costs_USD_2021 = total_restoration_costs_USD_2021/USD_rate_2021,
     total_land_value_USD_2021 = total_land_value_USD_2021/USD_rate_2021
   )
@@ -86,6 +86,6 @@ df_verra <- df_verra %>%
 
 
 # save
-saveRDS(df,"output_tables/stefan_results/abacus_high_low_leakage_projects_r1_local_biome_country_scale_prj_yield_SCC_3_USD.rds")
+saveRDS(df,"output_tables/abacus_high_low_leakage_projects_r1_local_biome_country_scale_prj_yield_SCC_3_USD.rds")
 saveRDS(df_random,"output_tables/abacus_random_projects_local_biome_country_scale_prj_yield_SCC_3_USD.rds")
 saveRDS(df_verra,"output_tables/stefan_results/verra_high_low_leakage_projects_r1_country_scale_prj_yield_SCC_3_USD.rds")

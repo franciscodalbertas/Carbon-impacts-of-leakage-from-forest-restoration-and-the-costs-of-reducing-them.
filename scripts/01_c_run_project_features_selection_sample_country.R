@@ -33,7 +33,7 @@ result <- run_leakage_analysis(source_type = source_type, leakage_scale = "count
 
 
 
-save_path <- paste0("mitigation_imputs/imputs_for_mitigation_leakage_",source_type,
+save_path <- paste0("mitigation_inputs/inputs_for_mitigation_leakage_",source_type,
                    "_country_scale_",yield_name,"_high_low_leakge_round1.rds")
 
 #save
@@ -47,11 +47,11 @@ projects <- readRDS("project_location/project_location_round1_randomsampled100pr
 # add fake yield_carbon_ratio column just to make the function run
 
 projects$yield_carbon_ratio <- "random"
-source_type = "verra"
+source_type <- "abacus"
 result2 <- run_leakage_analysis(source_type = source_type,leakage_scale = "country",
                                 projects = projects,FP_type = "capped_FP")
 # save
-save_path2 <- paste0("mitigation_imputs/imputs_for_mitigation_leakage_",source_type,
+save_path2 <- paste0("mitigation_inputs/inputs_for_mitigation_leakage_",source_type,
                       "_country_scale_yield_prj_random_sample_round1.rds")
 
 #save
