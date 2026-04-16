@@ -6,15 +6,6 @@ library(spatstat)
 
 # ------------------------------------------------------------------------------
 
-# I should run this once for the AM and once for the AF and store
-# the results. I can continue the selection later using the df
-# stored with the projects and coordinates!
-
-# Crop and mask the raster to the biome
-# yield_carbon_ratio_biome <- crop(yield_carbon_ratio, biome_boundary)
-# yield_carbon_ratio_biome <- mask(yield_carbon_ratio, biome_boundary)
-
-
 # Function to find clusters and calculate their sums
 find_clusters_and_sum <- function(r, land_value, biome, size) {
   results <- data.frame(summed_value = numeric(0), 

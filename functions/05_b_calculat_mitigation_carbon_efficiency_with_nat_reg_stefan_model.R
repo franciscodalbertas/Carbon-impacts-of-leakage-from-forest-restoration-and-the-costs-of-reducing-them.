@@ -231,8 +231,8 @@ carbon_optimization <- function(sr_carrying,
   final_selection$mitigation_costs_reais_50y <- 
     final_selection$cost_reais_ha * final_selection$area_required
   
-  # # MODIFY THIS TO HAVE THE SHAPEFILE AVAILABLE!!!!
-  # 
+ 
+  # ############################################################################
   # # save as shapefile to check on qgis ( modify this to save it appended so I 
   # # don't need to re-run everytime!!)
   # 
@@ -246,7 +246,7 @@ carbon_optimization <- function(sr_carrying,
   # } else {
   #   st_write(final_selection_shp, path)  # creates the file
   # }
-  # 
+  # ############################################################################
   
   # Insert here the calculation of carbon additionality discounted by SCC...and
   # by p.nat.reg! aqui eh onde precisa corrigir o calculo do delta carbon!

@@ -90,18 +90,6 @@ biomass_agg <- biomass_recovery2 %>%
     forgone_CO2_discounted = sum(forgone_CO2_discounted),
     .groups = "drop")
     
-# how come the ratio betwen forgone carbon discounted and not is exactly the 
-# the same for both max and min? I think it is because the only thing opperating
-# is the effect of the SCC discounting...
-
-
-# checking total discount!
-# #Total discount
-# total_discount <-   sum(biomass_recovery2$forgone_co2_lag) -
-#   sum(biomass_recovery2$forgone_CO2_discounted) 
-# 
-# # Relative discount (percentage)
-# discount_pct <- 100 * (1 - sum(biomass_recovery2$forgone_CO2_discounted)  / sum(biomass_recovery2$forgone_co2_lag))
 
 # return the results
 

@@ -1,7 +1,5 @@
 # with forgone production calculated, model where leakage is happening and quantify
-# consequences in terms of land use (this should vary with spatial scale)
-# forgot to incorporate verra or abacus parameters!!! this will change the fp!!
-# easy to do!
+# consequences in terms of land use
 
 
 
@@ -10,11 +8,6 @@ spatial_leakage <- function(projects, scale, mitigation_type = NULL){
   # for each project, at the cluster scale, I need to mask the immediate regions
   # and calculate pixels to leak based on prob. def + land value
   
-  # include a conditional argument if the scale is immediate region, biome, or
-  # country (start with immediate region only)
-  
-  # 1: open immediate_regions (replace this with something with average yield,
-  # growth yield and expected yield in 50y)
   
   # this works when leakage is LOCAL
   immediate_regions_sp <- readRDS("input_tables/imediate_regions_am_af.rds")
@@ -22,16 +15,10 @@ spatial_leakage <- function(projects, scale, mitigation_type = NULL){
   names(immediate_regions)[1] <- "code_immediate"
   # 2: filter immediate regions selected by projects! 
   immediate_regions_f <- filter(immediate_regions,code_immediate %in% as.character(projects$code_immediate))
-  #names(projects)[1] <- "code_immediate"
   # summarise fp per immediate region
   immediate_regions_sp$code_immediate <- as.character(immediate_regions_sp$code_immediate)
   immediate_regions_sp$year <- as.character(immediate_regions_sp$year)
   immediate_regions_sp$code_state <- as.character(immediate_regions_sp$code_state)
-  # add spatial part (no spatial incorporated!)
-  # immediate_regions_f <- st_as_sf(immediate_regions_f)
-  # immediate_regions_f <- st_join(immediate_regions_f,immediate_regions_sp)[,-c(26:30)]
-  # 
-  # Join the data, keeping geometry from immediate_region_sp
   # Join the data, keeping geometry from immediate_region_sp
   immediate_region_f_with_geom <- immediate_regions_f %>%
     left_join(immediate_regions_sp , by = "code_immediate") %>%
@@ -91,8 +78,6 @@ spatial_leakage <- function(projects, scale, mitigation_type = NULL){
       
     FP_leaked <- fp$total_FP_leaked
     
-    
-    #yield <- target$yield
     # get average yield from moving-window!
     yield <- rast("variables/mean_yield_10km_moving_window.tif")
     yield_c <- crop(yield,target)
@@ -147,10 +132,6 @@ spatial_leakage <- function(projects, scale, mitigation_type = NULL){
                              "prob_nat_reg")
     
     # add production - this is how much each forested area could produce
-    # should I use the yield considering the end of the period of 50 years
-    # or the average current yield of the immediate region?
-    # think using the average yield of the region is more accurate as deforestation
-    # is more likely shortly after the project is undertaken!
     
     values_df$beef_pot_prod_kg <- values_df$forest_area * values_df$yield_kg_ha 
     
@@ -184,7 +165,7 @@ spatial_leakage <- function(projects, scale, mitigation_type = NULL){
     final_selection$difference <- FP_leaked - final_selection$cumulative_production_kg 
     
     # calculate the required area deforested!
-    # check if this is correct!!!! 
+    
     final_selection <- final_selection %>%
       mutate(
         # proportion of the area forested that needs to be deforested
@@ -209,9 +190,7 @@ spatial_leakage <- function(projects, scale, mitigation_type = NULL){
   updated_projects <- do.call(rbind,rslt_list)
   
   # combine the above project with project info.!
-  # do I care about the location? no, aggregate to combine
-  # think about how to combine aggregated values with non-aggregate
-  # project locations!
+  
   updated_projects_agg <- updated_projects %>%
     group_by(yield_carbon_ratio,name_biome,code_immediate)%>%
     summarise(area_deforested =  sum(area_deforested),

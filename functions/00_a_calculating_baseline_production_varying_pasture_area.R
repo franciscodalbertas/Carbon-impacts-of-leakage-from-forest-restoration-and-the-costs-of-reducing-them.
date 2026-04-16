@@ -10,13 +10,6 @@
  
 # FP = BP -  MP
 
-# monitored production is done up to 5 years after the project start date.
-# Because the project will be implemented, I need to calculate MP just like BP but discouting the forgone production -- which can change depending on the action.
-
-# Definition of project area - the entire pixel
-# 
-# add a term so I can choose to use the default rj or the customized!!
-# then I can run the scenarios without worring about all the yield data I dont have!!
 
 # load packages ----------------------------------------------------------------
 
@@ -72,7 +65,6 @@ calc_baseline_production <- function(project,project_age,H, rate ,rj = NULL) {
 
   # combine project and rj
   projects <- projects %>%mutate(code_immediate = as.character(code_immediate))
-  #projects <- merge(projects,rj)
   projects <- left_join(projects,rj[,c(1,3,4,5)],by = join_by("code_immediate"=="cod_rgi"))
   
   }else {
@@ -109,9 +101,6 @@ calc_baseline_production <- function(project,project_age,H, rate ,rj = NULL) {
 
   projects$MP <- 0
   projects$FP <- projects$BP - projects$MP
-
-
-  # that's the yearly FP if leakage was 100%
 
   #return the result
   return(projects)

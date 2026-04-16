@@ -181,8 +181,7 @@ for (i in seq_along(scale)) {
     mutate(
       net_CO2_mitigation = additionality,
       net_CO2_no_mitigation = additionality - leaked_CO2,
-      EP = SCC_t / SCC_t0,  # check this! should change,  it was 133, now I replaced for 
-                            # a value that depends on the discount rate choosen!
+      EP = SCC_t / SCC_t0,  
       co2_removal_corrected = additionality * EP,
       co2_leaked_corrected = leaked_CO2 * EP
     ) %>%

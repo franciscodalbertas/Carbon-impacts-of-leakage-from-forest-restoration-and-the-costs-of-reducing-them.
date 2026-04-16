@@ -58,6 +58,7 @@ project_scale <- function(projects,
   
   # size of forgone production that would need to be mitigated
   # this now depend on the region and yield_carbon
+  
   # Amazonia
   target_FP_am_max <-  projects %>%
     filter(yield_carbon_ratio=="max",

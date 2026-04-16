@@ -93,24 +93,6 @@ generate_yield_carbon <- function(){
   yield_carbon_ratio_MA <- crop(yield_carbon_ratio_m,filter(biomes,name_biome=="Mata Atlântica"))
   
   
-  # calculate quantiles (generate without quantiles for now!)
-  # lower_quant_am <- quantile(x =terra::values(yield_carbon_ratio_AM) ,0.20,na.rm=T)
-  # lower_quant_ma <- quantile(x =terra::values(yield_carbon_ratio_MA) ,0.20,na.rm=T)
-  # 
-  # upper_quant_am <- quantile(x =terra::values(yield_carbon_ratio_AM) ,0.80,na.rm=T)
-  # upper_quant_ma <- quantile(x =terra::values(yield_carbon_ratio_MA) ,0.80,na.rm=T)
-  
-  
-  # calculate  range to explore prices!
-  #lower_quant_am_lim <- quantile(x =terra::values(yield_carbon_ratio_AM) ,0.21,na.rm=T)
-  #lower_quant_ma_lim <- quantile(x =terra::values(yield_carbon_ratio_MA) ,0.21,na.rm=T)
-  
-  #upper_quant_am_lim <- quantile(x =terra::values(yield_carbon_ratio_AM) ,0.79,na.rm=T)
-  #upper_quant_ma_lim <- quantile(x =terra::values(yield_carbon_ratio_MA) ,0.79,na.rm=T)
-  
-  # cap based on quantiles
-  #yield_carbon_ratio_AM <- ifel(yield_carbon_ratio_AM<lower_quant_am|yield_carbon_ratio_AM>upper_quant_am,NA,yield_carbon_ratio_AM)
-  #yield_carbon_ratio_MA <- ifel(yield_carbon_ratio_MA<lower_quant_ma|yield_carbon_ratio_MA>upper_quant_ma,NA,yield_carbon_ratio_MA)
   
   # Return all preprocessed objects as a named list
   list(

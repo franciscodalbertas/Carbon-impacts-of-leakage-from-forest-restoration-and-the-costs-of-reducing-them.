@@ -6,6 +6,7 @@
 if (!exists("source_params") || !exists("strategy")) {
   stop("You must define `source_params` and `strategy` before sourcing this script.")
 }
+
 message(glue::glue("Running with: source = {source_params}, strategy = {strategy}"))
 
 # ======================= LOAD PACKAGES & FUNCTIONS ==================
@@ -30,7 +31,7 @@ source("functions/09_preprocessing_rasters.R")
 
 # ======================= PREPROCESS DATA ============================
 # Initialize
-base_path <- "mitigation_imputs/imputs_for_mitigation_leakage_"
+base_path <- "mitigation_inputs/inputs_for_mitigation_leakage_"
 filename <- NULL
 
 # Only proceed if source_params is one of the expected values
@@ -64,11 +65,20 @@ years <- 49
 proj_location <- readRDS("project_location/project_location_round1_sampled100projects.rds")
 immediate_regions <- rast("variables/immediate_regions_r_limits_albers1km.tif")
 
+
+intensification_costs_input <- if (identical(intensification_model, "carlos")) {
+  intensification_costs
+} else {
+  intensification_costs_stefan
+}
+
+
+
 input_biome_scale <- project_scale(
   projects = get(glue("projects_{tolower(source_params)}_biome")),
   scale = "biome",
   pot_yield = pot_yield,
-  intensification_costs = intensification_costs,
+  intensification_costs = intensification_costs_input,
   pasture_share = pasture_share,
   maintenance_costs = maintenance_costs,
   rate = rate,
@@ -154,7 +164,7 @@ for (biome in biomes) {
     tolower() %>%
     gsub(" ", "", .)
   
-  save_name <- glue("results/mitigation_costs_biome_scale_intensification_{strategy}_{source_params}_{clean_biome}_{yield_param}_{SCC_param}_{round_mitigation}_{intensification_name}.rds")
+  save_name <- glue("results_with_mitigation/mitigation_costs_biome_scale_intensification_{strategy}_{source_params}_{clean_biome}_{yield_param}_{SCC_param}_{round}_{intensification_name}.rds")
   saveRDS(mitigation_combined, save_name)
   message(glue("Saved: {save_name}"))
 }

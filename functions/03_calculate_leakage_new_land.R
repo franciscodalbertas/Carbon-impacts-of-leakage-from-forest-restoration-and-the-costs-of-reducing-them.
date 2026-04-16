@@ -13,8 +13,6 @@ calc_fp_leaked <- function(fp,IS,NL){
   
 }
 
-# add an argument which FP I want (no yield growth, FP at carrying capacity or my current analysis)
-
 calc_leakage_deforestation <- function(project, IS, NL, FP) {
   
   if (FP == "capped_FP") {

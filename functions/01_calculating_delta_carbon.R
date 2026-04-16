@@ -20,7 +20,5 @@ calc_delta_c <- function(project)  {
   
   colnames(projects_C)[ncol(projects_C)-1] <- "delta_tons_ha"
   
-  #save data
-  #saveRDS(projects_C,"clusters/project_CO2.rds")
   return(projects_C)
 }

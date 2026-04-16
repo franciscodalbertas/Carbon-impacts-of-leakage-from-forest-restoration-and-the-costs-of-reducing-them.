@@ -231,12 +231,13 @@ carbon_optimization <- function(sr_carrying,
   final_selection$mitigation_costs_reais_50y <- 
     final_selection$cost_reais_ha * final_selection$area_required
   
+  ##############################################################################
   # save as shapefile to check on qgis
   # final_selection_shp <- st_as_sf(final_selection, coords = c("x_mitig","y_mitig"))
   # path <- paste0("output_tables/mitigation_locations_carbon",source_params,"_",mitigation_scale,"_",biome,"_","round8.shp")
   # st_write(final_selection_shp,path,append=F)
+  ##############################################################################
   
-  # untill here, the results make sense!!
 
   # Insert here the calculation of carbon additionality discounted by SCC...and
   # by p.nat.reg!
@@ -264,7 +265,7 @@ carbon_optimization <- function(sr_carrying,
   final_selection2$forgone_co2_nat_reg <- final_selection2$forgone_co2 * 
     final_selection2$p_n_r
   
-  # aggregate results to make the combination easier (this should not consider immediate regions for aggregate if the scale is biome)
+  # aggregate results to make the combination easier 
   
   if(mitigation_scale == "cluster"){
   

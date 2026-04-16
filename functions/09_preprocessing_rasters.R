@@ -20,13 +20,6 @@ preprocess_data <- function(path_verra = NULL, path_abacus = NULL) {
   ## Calculate yield gap to carbon ratio
   delta_yield_c <- rast("variables/yield_gap_carbon_pnr_ratio_albers_1km.tif")
   
-  # cap based on 20% and 80% percentiles
-  # this creates the NAs -- not sure why I need to cap (to be even with mitigation
-  # and leakge! but the way I capped is now different -- I capped the summed values
-  # of the clusters!!!!)# get the limits to capp accordingly! Also, it is not
-  # the same y/c ratio.. its yield_gap to carbon! so I need to extract this value
-  # and exclude the cells that fall outside!!
-  
   selected_projects <- readRDS("project_location/project_location_round1_sampled100projects.rds")
   
   # get coordinates
@@ -45,19 +38,13 @@ preprocess_data <- function(path_verra = NULL, path_abacus = NULL) {
   values_df <- terra::extract(delta_yield_c, coords_pj[,c(23,24)])
   
   # Join the extracted values back to original df
-  selected_projects_df <- bind_cols(coords_pj, values_df[, -1])  # Remove ID column from extract()
+  selected_projects_df <- bind_cols(coords_pj, values_df[, -1]) 
   
-  names(selected_projects_df)[25] <- "delta_yield_c" # it was 26
+  names(selected_projects_df)[25] <- "delta_yield_c" 
   
   bottom <- min(selected_projects_df$delta_yield_c,na.rm = T)
   top <-  max(selected_projects_df$delta_yield_c,na.rm = T)
   
- # not doing quantiles anymore, just following the same boundaries of my projects
- # selected
-  
-  # bottom <- stats::quantile(delta_yield_c,0.2,na.rm=T)
-  # top <- stats::quantile(delta_yield_c,0.8,na.rm=T)
-  # 
   delta_yield_c <- ifel(delta_yield_c<bottom,NA,delta_yield_c)
   delta_yield_c <- ifel(delta_yield_c>top,NA,delta_yield_c)
   
@@ -83,33 +70,33 @@ preprocess_data <- function(path_verra = NULL, path_abacus = NULL) {
   # Load carbon data and calculate yield-carbon ratio (future optimization)
   delta_carbon <- rast("variables/delta_AGC_BGC_SOC_Walter_22_albers_50y_1km.tif")
   
-  # Load project data (this changes with scale!!!)
+  # Load project data (this changes with scale but is only used if no project info is provided)
   read_rds_or_null <- function(path) {
     if (file.exists(path)) readRDS(path) else NULL
   }
   
   projects_verra_cluster <- read_rds_or_null(
-    use_path_verra("mitigation_inputs/inputs_for_mitigation_cluster_leakage_Verra_round1_SCC_cluster.rds")
+    use_path_verra("mitigation_inputs/inputs_for_mitigation_leakage_Verra_local_scale_yield_prj_high_low_leakage_SCC3_round1.rds")
   )
   
   projects_abacus_cluster <- read_rds_or_null(
-    use_path_abacus("mitigation_inputs/inputs_for_mitigation_leakage_abacus_local_scale_yield_prj_high_low_leakage_SCC_3_round1.rds")
+    use_path_abacus("mitigation_inputs/inputs_for_mitigation_leakage_abacus_local_scale_yield_prj_high_low_leakage_SCC3_round1.rds")
   )
   
   projects_verra_biome <- read_rds_or_null(
-    use_path_verra("mitigation_inputs/inputs_for_mitigation_cluster_leakage_Verra_round1_SCC_biome.rds")
+    use_path_verra("inputs_for_mitigation_leakage_Verra_biome_scale_yield_prj_high_low_leakage_SCC3_round1.rds")
   )
   
   projects_abacus_biome <- read_rds_or_null(
-    use_path_abacus("mitigation_inputs/inputs_for_mitigation_leakage_abacus_biome_scale_yield_prj_high_low_leakage_SCC_3_round1.rds")
+    use_path_abacus("inputs_for_mitigation_leakage_abacus_biome_scale_yield_prj_high_low_leakage_SCC3_round1.rds")
   )
   
   projects_verra_country <- read_rds_or_null(
-    use_path_verra("mitigation_inputs/inputs_for_mitigation_leakage_verra_country_scale_yield_prj_high_low_leakage_SCC_3_round1.rds")
+    use_path_verra("inputs_for_mitigation_leakage_Verra_country_scale_yield_prj_high_low_leakage_SCC3_round1.rds")
   )
   
   projects_abacus_country <- read_rds_or_null(
-    use_path_abacus("mitigation_inputs/inputs_for_mitigation_leakage_abacus_country_scale_yield_prj_high_low_leakage_SCC_3_round1.rds")
+    use_path_abacus("inputs_for_mitigation_leakage_abacus_country_scale_yield_prj_high_low_leakage_SCC3_round1.rds")
   )
   # Return all preprocessed objects as a named list
   list(
