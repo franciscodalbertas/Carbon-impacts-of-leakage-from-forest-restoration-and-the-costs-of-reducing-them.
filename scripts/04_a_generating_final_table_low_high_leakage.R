@@ -5,6 +5,14 @@ library(tidyr)
 
 #-------------------------------------------------------------------------------
 
+read_result_table <- function(path) {
+  x <- readRDS(path)
+  x_list <- unclass(x)
+  sfc_cols <- vapply(x_list, inherits, logical(1), what = "sfc")
+  x_list[sfc_cols] <- NULL
+  tibble::as_tibble(x_list)
+}
+
 # results for high and low projects
 
 all <- list.files(path = "results_with_mitigation/",pattern = "round1",full.names = T)
@@ -12,7 +20,8 @@ all <- list.files(path = "results_with_mitigation/",pattern = "round1",full.name
 # get it split by verra or abacus
 verra <- grep(pattern = "Verra",x = all,value = T)
 
-abacus <- grep(pattern = "ABACUS",x = all,value = T)
+# abacus or ABACUS
+abacus <- grep(pattern = "abacus", x = all, value = TRUE, ignore.case = TRUE)
 
 # --- generate single table for abacus ---
 
@@ -21,9 +30,9 @@ biome_scale <- grep(pattern = "biome_scale",x = abacus,value = T)
 country_scale <- grep(pattern = "country_scale",x = abacus,value = T)
 
 # read files
-local_l <- lapply(local_scale,readRDS)
-biome_l <- lapply(biome_scale,readRDS) 
-country_l <- lapply(country_scale,readRDS) 
+local_l <- lapply(local_scale, read_result_table)
+biome_l <- lapply(biome_scale, read_result_table) 
+country_l <- lapply(country_scale, read_result_table) 
 
 # combine into a single df
 local_df <- do.call(rbind,local_l)
@@ -138,7 +147,7 @@ saveRDS(projects,"output_tables/abacus_high_low_leakage_projects_r1_local_biome_
 country_scale_verra <- grep(pattern = "country_scale",x = verra,value = T)
 
 # read files
-country_l_verra <- lapply(country_scale_verra,readRDS) 
+country_l_verra <- lapply(country_scale_verra, read_result_table) 
 
 # combine into a single df
 country_df_verra <- do.call(rbind,country_l_verra)

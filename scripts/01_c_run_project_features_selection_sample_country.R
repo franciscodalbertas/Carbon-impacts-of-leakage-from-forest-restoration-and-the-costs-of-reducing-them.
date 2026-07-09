@@ -10,10 +10,10 @@ source("functions/12_run_project_features_sample_projects.R")
 
 #--- high and low projects -----------------------------------------------------
 
-projects <- readRDS("project_location/project_location_round1_sampled100projects.rds")
+projects <- readRDS("project_location/project_location_round1_sampled1000projects.rds")
 
 # run analysis for country scale
-source_type <- "abacus" # verra or abacus!!
+source_type <- "verra" # verra or abacus!!
 
 # type of yield projection: 
 #"capped_FP" =  projecting future trends 
@@ -42,12 +42,12 @@ saveRDS(result, save_path)
 # run analysis for random located projects -------------------------------------
 
 # read projects
-projects <- readRDS("project_location/project_location_round1_randomsampled100projects.rds")
+projects <- readRDS("project_location/project_location_round1_randomsampled1000projects.rds")
  
 # add fake yield_carbon_ratio column just to make the function run
 
 projects$yield_carbon_ratio <- "random"
-source_type <- "abacus"
+source_type <- "verra"
 result2 <- run_leakage_analysis(source_type = source_type,leakage_scale = "country",
                                 projects = projects,FP_type = "capped_FP")
 # save

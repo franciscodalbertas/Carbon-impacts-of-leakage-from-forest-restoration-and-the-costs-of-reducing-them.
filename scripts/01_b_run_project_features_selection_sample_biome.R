@@ -10,7 +10,7 @@ source("functions/12_run_project_features_sample_projects.R")
 
 #--- high and low projects ---
 
-projects <- readRDS("project_location/project_location_round1_sampled100projects.rds")
+projects <- readRDS("project_location/project_location_round1_sampled1000projects.rds")
 
 # Explanations on the parameters
 # source_type = "abacus(100%)" or "verra(30%)"
@@ -19,10 +19,10 @@ projects <- readRDS("project_location/project_location_round1_sampled100projects
 # "FP_carrying" - all projects achieve their carrying capacity
 # or "FP_zero_growth" - no yield growth, just use current yield for FP
 
-# run analysis for country scale
-source_type <- "abacus"
+# run analysis for biome scale
+source_type <- "verra" # abacus or verra
 
-result <- run_leakage_analysis(source_type = "abacus", leakage_scale = "biome",projects = projects,
+result <- run_leakage_analysis(source_type = source_type, leakage_scale = "biome",projects = projects,
                                FP_type = "capped_FP")
 
 
@@ -36,12 +36,12 @@ saveRDS(result, save_path)
 # run analysis for random located projects ---
 
 # read projects
-projects <- readRDS("project_location/project_location_round1_randomsampled100projects.rds")
+projects <- readRDS("project_location/project_location_round1_randomsampled1000projects.rds")
 
 # add fake yield_carbon_ratio column just to make the function run
 
 projects$yield_carbon_ratio <- "random"
-source_type = "abacus"
+source_type = "verra"
 result2 <- run_leakage_analysis(source_type = source_type,leakage_scale = "biome",
                                 projects = projects,FP_type = "capped_FP")
 

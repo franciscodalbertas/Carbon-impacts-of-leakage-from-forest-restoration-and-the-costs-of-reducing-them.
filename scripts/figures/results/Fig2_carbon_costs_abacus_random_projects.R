@@ -34,7 +34,7 @@ mean_labels_country <- country %>%
   group_by(name_biome, approach, yield_carbon_ratio) %>%
   summarize(mean_cost = median(CO2_cost_USD, na.rm = TRUE), .groups = "drop")
 
-
+# negative carbon costs are removed!
 
 plot_abacus_country <- country %>%
   mutate(CO2_cost = if_else(CO2_cost_USD<=0,NA,CO2_cost_USD),

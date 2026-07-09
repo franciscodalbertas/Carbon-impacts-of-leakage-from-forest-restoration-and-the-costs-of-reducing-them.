@@ -3,9 +3,9 @@
 #-------------------------------------------------------------------------------
 
 # running for cluster scale
-scale <- c("biome") # run for multiple scales (options: "local","biome","country")
+scale <- c("local", "biome", "country") # run for multiple scales (options: "local","biome","country")
 
-source_to_read <- "abacus" # "abacus" or "verra" or "both"
+source_to_read <- "both" # "abacus" or "verra" or "both"
 
 # define discount rate for SCC
 

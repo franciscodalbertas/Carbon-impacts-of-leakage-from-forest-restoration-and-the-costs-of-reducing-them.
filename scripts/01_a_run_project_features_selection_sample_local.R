@@ -11,7 +11,7 @@ source("functions/12_run_project_features_sample_projects.R")
 #--- high and low projects ---
 
 # read projects
-projects <- readRDS("project_location/project_location_round1_sampled100projects.rds")
+projects <- readRDS("project_location/project_location_round1_sampled1000projects.rds")
 
 # Explanations on the parameters
 # source_type = "abacus(100%)" or "verra(30%)"
@@ -24,7 +24,7 @@ projects <- readRDS("project_location/project_location_round1_sampled100projects
 # abacus
 
 # run leakage analysis for abacus projects at cluster scale
-source_type = "abacus"
+source_type = "verra"
 
 result <- run_leakage_analysis(source_type = source_type, leakage_scale = "cluster",
                      projects = projects,FP_type = "capped_FP")
@@ -33,8 +33,6 @@ result <- run_leakage_analysis(source_type = source_type, leakage_scale = "clust
 save_path <- paste0("mitigation_inputs/inputs_for_mitigation_leakage_",source_type,
                   "_local_scale_yield_prj_high_low_leakge_round1.rds")
 
-# saveRDS(r,paste0("mitigation_imputs/imputs_for_mitigation_leakage_Abacus_round9_",
-#                  scale,"_random100sample.rds"))
 
 saveRDS(result, save_path)
 
@@ -42,11 +40,11 @@ saveRDS(result, save_path)
 
 
 # read projects
-projects <- readRDS("project_location/project_location_round1_randomsampled100projects.rds")
+projects <- readRDS("project_location/project_location_round1_randomsampled1000projects.rds")
 
 # add fake yield_carbon_ratio column just to make the function run
 projects$yield_carbon_ratio <- "random"
-source_type = "abacus"
+source_type = "verra"
 result2 <- run_leakage_analysis(source_type = source_type,leakage_scale = "cluster",
                     projects = projects,FP_type = "capped_FP")
 

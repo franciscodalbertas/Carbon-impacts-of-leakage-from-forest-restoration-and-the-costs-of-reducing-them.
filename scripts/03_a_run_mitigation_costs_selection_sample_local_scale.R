@@ -16,7 +16,13 @@ intensification_name <- "wirsenius" # Wirsenius was used for the central analysi
 # sensitivity analysis with "carlos"
 
 # run mitigation cost calculation
-source("functions/14_a_calculating_mitigation_costs_imediate_region_project_sample_modular.R")
+mitigation_scale <- "cluster"
+
+if (strategy == "optimize_carbon") {
+  source("functions/16_run_mitigation_costs_precomputed_carbon.R")
+} else {
+  source("functions/14_a_calculating_mitigation_costs_imediate_region_project_sample_modular.R")
+}
 
 
 
