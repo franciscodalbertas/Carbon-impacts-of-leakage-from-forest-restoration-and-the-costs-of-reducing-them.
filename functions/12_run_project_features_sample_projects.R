@@ -57,7 +57,7 @@ run_leakage_analysis <- function(source_type = NULL, leakage_scale = NULL, proje
   # Project costs
   projects_costs <- calc_project_cost(project = projects_deltaC)
   
-  # Get leakage parameters
+  # Get leakage parameters (I can add new values here!)
   get_leakage_params <- function(source) {
     switch(source,
            "verra" = list(IS = 0.75, NL = 0.4),
@@ -68,7 +68,8 @@ run_leakage_analysis <- function(source_type = NULL, leakage_scale = NULL, proje
   
   params <- get_leakage_params(source_type)
   
-  # Leakage deforestation (I think I need to add a term here!!)
+  # Leakage deforestation (for now, this only calculates AGB leaked. I need
+  # to add SOC and BGB)...this is also a function i can prob. optimize!
   projects_leakage <- calc_leakage_deforestation(
     project = projects_costs,
     IS = params$IS,
@@ -81,16 +82,8 @@ run_leakage_analysis <- function(source_type = NULL, leakage_scale = NULL, proje
   projects_leakage$prob_nat_regeneration <- terra::extract(nat_reg, projects_leakage)[,2]
 
   
-  # run sequential!
   run_spatial_leakage <- function(projects_data, scale) {
-    projects_split <- split(projects_data, projects_data$coordinates)
-    
-    # Sequential processing
-    plan(sequential)
-    
-    leakage_ls <- map(projects_split, ~spatial_leakage(.x, scale = scale))
-    
-    do.call(rbind, leakage_ls)
+    spatial_leakage(projects_data, scale = scale)
   }
   
   spatial_leak <- run_spatial_leakage(projects_leakage, leakage_scale)
@@ -115,11 +108,15 @@ run_leakage_analysis <- function(source_type = NULL, leakage_scale = NULL, proje
  # }
   
   # Merge
-  final_result <- left_join(projects_agg, spatial_leak) %>%
+  final_result <- left_join(
+    projects_agg,
+    spatial_leak,
+    by = c("code_immediate", "yield_carbon_ratio", "name_biome", "name_immediate", "coordinates")
+  ) %>%
     st_drop_geometry()
   
   final_result$leakage_scale <- leakage_scale
-  final_result$FP_type 
+  final_result$FP_type <- FP_type
   
   # add return instead!
   return(final_result)

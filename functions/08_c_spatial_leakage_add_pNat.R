@@ -25,7 +25,7 @@ spatial_leakage <- function(projects, scale, mitigation_type = NULL){
     st_as_sf()
   
   total_fp <- projects %>%
-    group_by(yield_carbon_ratio,name_biome,code_immediate,name_immediate)%>%
+    group_by(yield_carbon_ratio,name_biome,code_immediate,name_immediate,coordinates)%>%
     mutate(area = 100) %>%
     summarise(
       # FP leaked == FP_capped
@@ -36,7 +36,8 @@ spatial_leakage <- function(projects, scale, mitigation_type = NULL){
               } else {
                 sum(pasture_area_ha)
               },
-              total_area = sum(area)) 
+              total_area = sum(area),
+      .groups = "drop") 
   
   # raster with forest cover 
   fc <- rast("variables/forest_cover_albers_1km_2021.tif")
@@ -46,143 +47,168 @@ spatial_leakage <- function(projects, scale, mitigation_type = NULL){
   
   # raster with land value
   landvalue <- rast("variables/land_value_2023_albers_1km.tif")
+
+  # raster with average yield from moving-window
+  yield <- rast("variables/mean_yield_10km_moving_window.tif")
+
+  # current carbon
+  current <- rast("variables/AGC_current_Walter_22_layer_albers_1km_res.tif")
+
+  # prob. nat. regeneration (added just in case. should not be used here probably)
+  nat_reg <- rast("variables/prob_nat_regeneration_all_vegetation_albers1km_pj.tif")
+
+  biome_regions <- NULL
+  country_target <- NULL
   
   # here I need to modify, for each immediate region
   
   immediate_regions_ls <- unique(total_fp$code_immediate)
   
   rslt_list <- list()
+  candidate_cache <- list()
   
   # I am loosing the info of biome, yield_carbon ratio
   
   for(i in seq_along(immediate_regions_ls)){
     
     
+    fp <- total_fp %>%
+      filter(code_immediate ==immediate_regions_ls[i])
+
     if(scale == "cluster"){
       # get immediate region boundary
       target <- immediate_region_f_with_geom %>%
       filter(code_immediate == immediate_regions_ls[i])%>%
       st_transform(crs = crs(fc))
-      }else if(scale == "biome"){
+      cache_key <- paste0("cluster_", immediate_regions_ls[i])
+    }else if(scale == "biome"){
       # get biome boundaries!  
-      target <- readRDS("input_tables/am_af.rds")
-      target <- filter(target, name_biome == total_fp$name_biome[i])
+      if (is.null(biome_regions)) {
+        biome_regions <- readRDS("input_tables/am_af.rds")
+      }
+      target <- filter(biome_regions, name_biome == fp$name_biome[1])
+      cache_key <- paste0("biome_", fp$name_biome[1])
     }else{
-        
-      target <- rast("variables/delta_AGC_BGC_SOC_Walter_22_albers_50y_1km.tif")
+      if (is.null(country_target)) {
+        country_target <- rast("variables/delta_AGC_BGC_SOC_Walter_22_albers_50y_1km.tif")
+      }
+      target <- country_target
+      cache_key <- "country"
           
           }
-    
-    fp <- total_fp %>%
-      filter(code_immediate ==immediate_regions_ls[i])
+
+    if (is.null(candidate_cache[[cache_key]])) {
+      yield_c <- crop(yield,target)
+      yield_m <- mask(yield_c,target)
+      # get forest cover
+      fc_c <- crop(fc,target)
+      fc_m <- mask(fc_c,target)
+      # round values
+      fc_m <- round(fc_m,2)
+      # tranform fc ==0 in NA
+      fc_mask <- ifel(fc_m==0,NA,1)
+      # get prob. deforestation
+      def_c <- crop(def,target)
+      def_m <- mask(def_c,target)
+      # mask def to areas with forest
+      def_m <- def_m*fc_mask
       
-    FP_leaked <- fp$total_FP_leaked
-    
-    # get average yield from moving-window!
-    yield <- rast("variables/mean_yield_10km_moving_window.tif")
-    yield_c <- crop(yield,target)
-    yield_m <- mask(yield_c,target)
-    # get forest cover
-    fc_c <- crop(fc,target)
-    fc_m <- mask(fc_c,target)
-    # round values
-    fc_m <- round(fc_m,2)
-    # tranform fc ==0 in NA
-    fc_mask <- ifel(fc_m==0,NA,1)
-    # get prob. deforestation
-    def_c <- crop(def,target)
-    def_m <- mask(def_c,target)
-    # mask def to areas with forest
-    def_m <- def_m*fc_mask
-    
-    # get land value
-    landvalue_c <- crop(landvalue,target)
-    landvalue_m <- mask(landvalue_c,target)
-    
-    # mask def to areas with forest
-    landvalue_m <- landvalue_m*fc_mask
-    
-    # calculate forest area (assuming the average yield, I can get cleared land
-    # based on the forest area)
-    forest_area <- fc_m *100
-    
-    # current carbon
-    current <- rast("variables/AGC_current_Walter_22_layer_albers_1km_res.tif")
-    current_c <- crop(current,target)
-    current_m <- mask(current_c,target)
-    
-    # prob. nat. regeneration (added just in case. should not be used here probably)
-    nat_reg <- rast("variables/prob_nat_regeneration_all_vegetation_albers1km_pj.tif")
-    nat_reg_c <- crop(nat_reg,target)
-    nat_reg_m <- mask(nat_reg_c,target)
-    # Combine rasters into a SpatRaster collection (add yield mean!)
-    rasters <- c(landvalue_m, def_m, forest_area,current_m,yield_m,nat_reg_m)
-    
-    # Extract values from all rasters
-    values_df <- as.data.frame(rasters, na.rm = T,xy=T)
-    
-    # Rename the columns for clarity
-    colnames(values_df) <- c("x",
-                             "y",
-                             "land_value",
-                             "prob_clearance",
-                             "forest_area",
-                             "carbon_ton_ha",
-                             "yield_kg_ha",
-                             "prob_nat_reg")
-    
-    # add production - this is how much each forested area could produce
-    
-    values_df$beef_pot_prod_kg <- values_df$forest_area * values_df$yield_kg_ha 
-    
-    
-    
-    # arrange in decreasing order of prob. of conversion and increasing order of
-    # land value
-    
-    arranged_df <- values_df %>%
-      arrange(desc(prob_clearance), (land_value))%>%
-      mutate(
-          cumulative_production_kg = cumsum(beef_pot_prod_kg)
+      # get land value
+      landvalue_c <- crop(landvalue,target)
+      landvalue_m <- mask(landvalue_c,target)
+      
+      # mask def to areas with forest
+      landvalue_m <- landvalue_m*fc_mask
+      
+      # calculate forest area (assuming the average yield, I can get cleared land
+      # based on the forest area)
+      forest_area <- fc_m *100
+      
+      current_c <- crop(current,target)
+      current_m <- mask(current_c,target)
+      
+      nat_reg_c <- crop(nat_reg,target)
+      nat_reg_m <- mask(nat_reg_c,target)
+      # Combine rasters into a SpatRaster collection (add yield mean!)
+      rasters <- c(landvalue_m, def_m, forest_area,current_m,yield_m,nat_reg_m)
+      
+      # Extract values from all rasters
+      values_df <- as.data.frame(rasters, na.rm = T,xy=T)
+      
+      # Rename the columns for clarity
+      colnames(values_df) <- c("x",
+                               "y",
+                               "land_value",
+                               "prob_clearance",
+                               "forest_area",
+                               "carbon_ton_ha",
+                               "yield_kg_ha",
+                               "prob_nat_reg")
+      
+      # add production - this is how much each forested area could produce
+      
+      values_df$beef_pot_prod_kg <- values_df$forest_area * values_df$yield_kg_ha 
+      
+      
+      
+      # arrange in decreasing order of prob. of conversion and increasing order of
+      # land value
+      
+      arranged_df <- values_df %>%
+        arrange(desc(prob_clearance), (land_value))%>%
+        mutate(
+            cumulative_production_kg = cumsum(beef_pot_prod_kg)
+        )
+
+      candidate_cache[[cache_key]] <- list(
+        arranged_df = arranged_df,
+        cumulative_area = cumsum(arranged_df$forest_area),
+        cumulative_carbon = cumsum(arranged_df$carbon_ton_ha * arranged_df$forest_area)
       )
-    
-    # select pixels untill the production is met. I need to account for partial
-    # clearance too. So, a new column of how much land was cleared will be needed
-    
-    # Find the smallest subset of pixels that meets or exceeds the production target
-    selected_pixels <- arranged_df %>%
-      filter(cumulative_production_kg >= FP_leaked) %>%
-      slice(1)
-    
-    # Get the index of the last included pixel
-    last_included_index<- which(arranged_df$cumulative_production_kg == selected_pixels$cumulative_production_kg[1])
-    
-    # Select all pixels up to and including the last one needed to exceed the target
-    final_selection <- arranged_df[1:last_included_index, ]
-    
-    # calculate the difference between the target and the production achieved
-    
-    final_selection$difference <- FP_leaked - final_selection$cumulative_production_kg 
-    
-    # calculate the required area deforested!
-    
-    final_selection <- final_selection %>%
-      mutate(
-        # proportion of the area forested that needs to be deforested
-        production_ratio = if_else(cumulative_production_kg<=FP_leaked,
-                                   1,
-                                   abs(difference/beef_pot_prod_kg)),
-        area_deforested = production_ratio*forest_area,
-        leaked_carbon = carbon_ton_ha * area_deforested,
-        leaked_CO2 = leaked_carbon * (44/12))
-    
-    
-    final_selection$yield_carbon_ratio <- fp$yield_carbon_ratio
-    final_selection$name_biome <- fp$name_biome
-    final_selection$code_immediate <- fp$code_immediate
-    final_selection$name_immediate <- fp$name_immediate
-    
-    rslt_list[[i]] <- final_selection
+    }
+
+    arranged_df <- candidate_cache[[cache_key]]$arranged_df
+    cumulative_area <- candidate_cache[[cache_key]]$cumulative_area
+    cumulative_carbon <- candidate_cache[[cache_key]]$cumulative_carbon
+    cumulative_co2 <- cumulative_carbon * (44/12)
+
+    project_selection <- vector("list", nrow(fp))
+
+    for (j in seq_len(nrow(fp))) {
+      FP_leaked <- fp$total_FP_leaked[j]
+
+      last_included_index <- which(arranged_df$cumulative_production_kg >= FP_leaked)[1]
+
+      previous_index <- last_included_index - 1L
+      previous_production <- if (previous_index > 0) arranged_df$cumulative_production_kg[previous_index] else 0
+      previous_area <- if (previous_index > 0) cumulative_area[previous_index] else 0
+      previous_carbon <- if (previous_index > 0) cumulative_carbon[previous_index] else 0
+      previous_co2 <- if (previous_index > 0) cumulative_co2[previous_index] else 0
+
+      last_pixel <- arranged_df[last_included_index, ]
+      production_ratio <- if (last_pixel$cumulative_production_kg <= FP_leaked) {
+        1
+      } else {
+        (FP_leaked - previous_production) / last_pixel$beef_pot_prod_kg
+      }
+
+      area_deforested <- previous_area + (production_ratio * last_pixel$forest_area)
+      leaked_carbon <- previous_carbon + (last_pixel$carbon_ton_ha * production_ratio * last_pixel$forest_area)
+      leaked_CO2 <- previous_co2 + (last_pixel$carbon_ton_ha * production_ratio * last_pixel$forest_area * (44/12))
+
+      project_selection[[j]] <- data.frame(
+        yield_carbon_ratio = fp$yield_carbon_ratio[j],
+        name_biome = fp$name_biome[j],
+        code_immediate = fp$code_immediate[j],
+        name_immediate = fp$name_immediate[j],
+        coordinates = fp$coordinates[j],
+        area_deforested = area_deforested,
+        leaked_carbon = leaked_carbon,
+        leaked_CO2 = leaked_CO2
+      )
+    }
+
+    rslt_list[[i]] <- do.call(rbind,project_selection)
     
   
     }
@@ -192,10 +218,11 @@ spatial_leakage <- function(projects, scale, mitigation_type = NULL){
   # combine the above project with project info.!
   
   updated_projects_agg <- updated_projects %>%
-    group_by(yield_carbon_ratio,name_biome,code_immediate)%>%
+    group_by(yield_carbon_ratio,name_biome,code_immediate,coordinates)%>%
     summarise(area_deforested =  sum(area_deforested),
               leaked_carbon=sum(leaked_carbon),
-              leaked_CO2 = sum(leaked_CO2))
+              leaked_CO2 = sum(leaked_CO2),
+              .groups = "drop")
   
   to_bind <- immediate_region_f_with_geom %>% dplyr::select(code_immediate,P_UF,DA_uf,yield)
   # add data on project current yield and average immediate_region_yield
@@ -205,7 +232,6 @@ spatial_leakage <- function(projects, scale, mitigation_type = NULL){
     left_join(to_bind,by = "code_immediate")
     
   updated_projects_agg <- st_drop_geometry(updated_projects_agg)
-  updated_projects_agg <- updated_projects_agg[,-10]
   # organizing names to make it clearer!
   updated_projects_agg <- updated_projects_agg %>%
     rename(current_avg_yield =  yield)
@@ -213,7 +239,11 @@ spatial_leakage <- function(projects, scale, mitigation_type = NULL){
   
   # add area reforested
   
-  updated_projects_agg2 <- left_join(updated_projects_agg,total_fp)
+  updated_projects_agg2 <- left_join(
+    updated_projects_agg,
+    total_fp,
+    by = c("yield_carbon_ratio", "name_biome", "code_immediate", "coordinates")
+  )
   
   return(updated_projects_agg2)
 }

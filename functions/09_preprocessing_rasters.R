@@ -20,7 +20,13 @@ preprocess_data <- function(path_verra = NULL, path_abacus = NULL) {
   ## Calculate yield gap to carbon ratio
   delta_yield_c <- rast("variables/yield_gap_carbon_pnr_ratio_albers_1km.tif")
   
-  selected_projects <- readRDS("project_location/project_location_round1_sampled100projects.rds")
+  selected_projects_path <- if (file.exists("project_location/project_location_round1_sampled1000projects.rds")) {
+    "project_location/project_location_round1_sampled1000projects.rds"
+  } else {
+    "project_location/project_location_round1_sampled100projects.rds"
+  }
+
+  selected_projects <- readRDS(selected_projects_path)
   
   # get coordinates
   
@@ -35,12 +41,11 @@ preprocess_data <- function(path_verra = NULL, path_abacus = NULL) {
   
   
   # Extract raster values at point locations (was 24,25)
-  values_df <- terra::extract(delta_yield_c, coords_pj[,c(23,24)])
+  values_df <- terra::extract(delta_yield_c, coords_pj[,c("x","y")])
   
   # Join the extracted values back to original df
-  selected_projects_df <- bind_cols(coords_pj, values_df[, -1]) 
-  
-  names(selected_projects_df)[25] <- "delta_yield_c" 
+  selected_projects_df <- coords_pj %>%
+    mutate(delta_yield_c = values_df[[2]])
   
   bottom <- min(selected_projects_df$delta_yield_c,na.rm = T)
   top <-  max(selected_projects_df$delta_yield_c,na.rm = T)

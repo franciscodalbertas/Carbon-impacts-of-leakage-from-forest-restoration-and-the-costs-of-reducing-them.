@@ -22,7 +22,9 @@ carbon_optimization <- function(sr_carrying,
                           p_n_r
                            ){
   
-  source("functions/13_c_SCC_mitigation_sites.R")
+  if (!exists("SCC_calculator", mode = "function")) {
+    source("functions/13_c_SCC_mitigation_sites.R")
+  }
   
   
   # transform in a matrix (need to add yield to the extraction)

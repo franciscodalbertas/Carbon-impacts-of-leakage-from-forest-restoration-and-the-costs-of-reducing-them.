@@ -5,7 +5,7 @@ library(tidyr)
 
 #------------------------------------------------------------------------------
 
-project_selection <- function(yield_carbon_ratio) {
+project_selection <- function(yield_carbon_ratio,n_projects) {
   
   # yield
   
@@ -19,13 +19,13 @@ project_selection <- function(yield_carbon_ratio) {
   # land value
   land_value <- rast("variables/land_value_2023_albers_1km.tif")
   
-  # choose min projects (bottom 100)
-  min <- yield_carbon_ratio[order(yield_carbon_ratio[["summed_value"]]), ][1:100, ]
-  max <-  yield_carbon_ratio[order(yield_carbon_ratio[["summed_value"]], decreasing = TRUE), ][1:100, ]
+  # choose min projects (bottom 1000)
+  min <- yield_carbon_ratio[order(yield_carbon_ratio[["summed_value"]]), ][1:n_projects, ]
+  max <-  yield_carbon_ratio[order(yield_carbon_ratio[["summed_value"]], decreasing = TRUE), ][1:n_projects, ]
   
   # add ranking ID
-  min$project_rank <- seq(1:100)
-  max$project_rank <- seq(1:100)
+  min$project_rank <- seq(1:n_projects)
+  max$project_rank <- seq(1:n_projects)
   
   #Split and unnest
   coords_min <- min %>%
@@ -36,9 +36,6 @@ project_selection <- function(yield_carbon_ratio) {
   # proj_area
   proj_area <- nrow(coords_min%>%filter(project_rank==1))
   
-  # coords_min$x <- as.numeric(coords_min$x)
-  # coords_min$y <- as.numeric(coords_min$y)
-  #coords_min$code_immediate <- min$code_immediate
   coords_min$mean_y_c <- coords_min$summed_value/proj_area
   
   # Extract the coordinates  for max(split them into x, y pairs)

@@ -39,12 +39,17 @@ filename <- NULL
 # Only proceed if source_params is one of the expected values
 if (source_params %in% c("ABACUS", "Verra")) {
   
-  # Start filename
+  # Start filename. Prefer the SCC-tagged name used by the mitigation pipeline,
+  # but fall back to the current leakage-input name if the SCC file is not present.
   filename <- paste0(base_path,tolower(source_params),"_local_scale_",yield_param,
-                     "_high_low_leakage_",SCC_param,"_",round)
-  
-  # Add extension
-  filename <- paste0(filename, ".rds")
+                     "_high_low_leakage_",SCC_param,"_",round,".rds")
+
+  fallback_filename <- paste0(base_path,tolower(source_params),"_local_scale_",yield_param,
+                              "_high_low_leakge_",round,".rds")
+
+  if (!file.exists(filename) && file.exists(fallback_filename)) {
+    filename <- fallback_filename
+  }
   
   # Assign path to correct input
   path_verra <- if (source_params == "Verra") filename else NULL
@@ -66,7 +71,13 @@ list2env(data, .GlobalEnv)
 rate <- 0.08
 years <- if (identical(intensification_model, "carlos")) 49 else 50
 # change if there's updates in project location
-proj_location <- readRDS("project_location/project_location_round1_sampled100projects.rds")
+proj_location_path <- if (file.exists("project_location/project_location_round1_sampled1000projects.rds")) {
+  "project_location/project_location_round1_sampled1000projects.rds"
+} else {
+  "project_location/project_location_round1_sampled100projects.rds"
+}
+
+proj_location <- readRDS(proj_location_path)
 immediate_regions <- rast("variables/immediate_regions_r_limits_albers1km.tif")
 
 # change cost input
@@ -91,7 +102,7 @@ input_cluster_scale <- project_scale(
   min_cost = min_cost,
   current_yield = current_yield,
   delta_y_c = delta_y_c,
-  intensification_model = NULL
+  intensification_model = intensification_model
 )
 
 sf_object <- st_transform(proj_location, crs = crs(input_cluster_scale[[1]]))

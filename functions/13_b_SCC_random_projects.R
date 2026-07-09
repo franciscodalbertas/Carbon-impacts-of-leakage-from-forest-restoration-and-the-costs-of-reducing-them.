@@ -4,6 +4,13 @@
 library(tidyr)
 library(dplyr)
 
+drop_sfc_columns <- function(x) {
+  x_list <- unclass(x)
+  sfc_cols <- vapply(x_list, inherits, logical(1), what = "sfc")
+  x_list[sfc_cols] <- NULL
+  tibble::as_tibble(x_list)
+}
+
 # Allow override from master script
 if (!exists("scale")) scale <- c("cluster", "biome", "country")
 if (!exists("source_to_read")) source_to_read <- "both"  # Options: "verra", "abacus", "both"
@@ -41,6 +48,7 @@ if(!exists("SCC_rate")) {
 
 biomass_recovery <- readRDS("input_tables/biomass_recovery.rds")
 recovery_50y <- biomass_recovery %>% filter(years == 50) %>% pull(recovery)
+biomass_recovery_base <- biomass_recovery
 
 for (i in seq_along(scale)) {
   
@@ -52,15 +60,15 @@ for (i in seq_along(scale)) {
     
     # precisa rodar esse cenario aqui, de random com l=.3
     # e SCC eu aplico depois, mas eh 3%
-    verra <- readRDS(paste0("mitigation_inputs/inputs_for_mitigation_leakage_verra_",
-                             scale[i],"_scale_yield_prj_random_sample_round1.rds"))
+    verra <- drop_sfc_columns(readRDS(paste0("mitigation_inputs/inputs_for_mitigation_leakage_verra_",
+                                             scale[i],"_scale_yield_prj_random_sample_round1.rds")))
   
     project_id <- unique(verra$coordinates)
     
     }
   if (read_abacus) {
-    abacus <- readRDS(paste0("mitigation_inputs/inputs_for_mitigation_leakage_abacus_",
-                             scale[i],"_scale_yield_prj_random_sample_round1.rds"))
+    abacus <- drop_sfc_columns(readRDS(paste0("mitigation_inputs/inputs_for_mitigation_leakage_abacus_",
+                                              scale[i],"_scale_yield_prj_random_sample_round1.rds")))
     
     project_id <- unique(abacus$coordinates)
     
@@ -68,7 +76,7 @@ for (i in seq_along(scale)) {
   
   #expand biomass_recovery
   
-  biomass_recovery <- biomass_recovery %>%
+  biomass_recovery <- biomass_recovery_base %>%
     crossing(coordinates = project_id) 
   
   
