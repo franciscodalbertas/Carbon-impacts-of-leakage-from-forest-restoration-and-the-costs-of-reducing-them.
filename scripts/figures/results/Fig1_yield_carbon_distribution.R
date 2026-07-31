@@ -13,11 +13,11 @@ library(patchwork)
 
 # this is how to generate the df for ploting (only need to do it once) ---------
 
-# get cluster data
+# get cluster data 
 
-ma <- readRDS("input_tables/clustered_pixels_MA_full_distribution.RDS")
+ma <- readRDS("input_tables/all_potential_projects_AF.rds")
 # # AM
-am <- readRDS("input_tables/clustered_pixels_AM_full_distribution.RDS")
+am <- readRDS("input_tables/all_potential_projects_AM.rds")
 # 
 # #Split and unnest
 coords_ma <- ma %>%
@@ -29,44 +29,39 @@ coords_am <- am %>%
   mutate(coord_pairs = strsplit(coordinates, ";")) %>%
   unnest(coord_pairs) %>%
   separate(coord_pairs, into = c("x", "y"), sep = ",", convert = TRUE)
-# 
-# 
-# # add biome data
-# 
+
+# add biome data
+ 
 coords_am <- coords_am %>% mutate(name_biome = "Amazon")
 coords_ma <- coords_ma %>% mutate(name_biome = "Atlantic Forest")
-# 
-# # combine the dataframes
-# 
+ 
+# combine the dataframes
+ 
 df <- rbind(coords_am,coords_ma)
-# 
-# 
-# # load yield data
+
+# load yield data
 yield <- rast("variables/beef_yield_kg_ha_2021_albers_1km.tif")
-# 
-# # opening additional carbon
+ 
+# opening additional carbon
 carbon <- rast("variables/delta_AGC_BGC_SOC_Walter_22_albers_50y_1km.tif")
-# 
 
 # area restorable
 
 pasture_area <- rast("variables/pasture_coverage_lapig_2021_col8albers_pj_1000mres.tif")
 
-# # Combine rasters
+# Combine rasters
 rasters <- c(yield, carbon,pasture_area)
 names(rasters) <- c("yield", "carbon","restorable_area")
-# 
-# # Convert your data frame to a SpatVector
+# Convert your data frame to a SpatVector
 points <- vect(df, geom = c("x", "y"), crs = crs(rasters))
-# 
-# # Extract raster values at point locations
+ 
+# Extract raster values at point locations
 values_df <- terra::extract(rasters, points)
-# 
-# # Join the extracted values back to original df
+ 
+# Join the extracted values back to original df
 df_with_values <- bind_cols(df, values_df[, -1])  # Remove ID column from extract()
-# 
-# # save so I dont need to wait so much time to generate it again!
-# 
+
+# save so I dont need to wait so much time to generate it again!
 saveRDS(df_with_values,"input_tables/yield_carbon_values_all_cluster_cells.rds")
 
 #-------------------------------------------------------------------------------
@@ -256,6 +251,8 @@ make_hist_col <- function(metric, xlim_vec) {
 
 # 3) Build left and right columns
 p_yield  <- make_hist_col("yield",  c(0, 250))
+p_yield <- p_yield+
+  ylab("number of projects")
 p_carbon <- make_hist_col("carbon", c(0, 700)) 
 
 
@@ -266,12 +263,12 @@ theme_left_col <- theme(
   axis.text.y  = element_text(),
   axis.ticks.y = element_line(),
   
-  # 🔑 explicitly keep x-axis title
+  # explicitly keep x-axis title
   axis.title.x = element_text(),
   axis.text.x  = element_text(),
   axis.ticks.x = element_line(),
   
-  # 🔑 remove biome facet labels on the left
+  # remove biome facet labels on the left
   strip.text.y = element_blank(),
   strip.background.y = element_blank()
 )
@@ -288,6 +285,7 @@ p_carbon <- make_hist_col("carbon", c(0, 750)) + theme_right_col+xlab(expression
 
 # 4) Combine side-by-side: need to fix the labelling!
 hist_panel_1 <- p_yield | p_carbon
+
 
 # compute quantiles
 q_vals <- df_l_filtered %>%
@@ -393,19 +391,19 @@ hist_panel_2 <- hist_panel_2 +
   )
 
 
-hist_panel_2 <- hist_panel_2 + xlab(expression(kg~yr^{-1}~t~CO[2]))
+hist_panel_2 <- hist_panel_2 + 
+  xlab(expression(kg~yr^{-1}~t~CO[2]))+
+  ylab("number of projects")
 
 final <- ggarrange(hist_panel_1,hist_panel_2,nrow = 2)
 
-final
-
-# ggsave(
-#   "figures/results/manuscript/distribution_y_cv04.png",
-#   final,
-#   height = 15,
-#   width = 14,
-#   units = "cm",
-#   bg = "white")
+ggsave(
+  "figures/Fig1.png",
+  final,
+  height = 15,
+  width = 14,
+  units = "cm",
+  bg = "white")
 
 
 ggsave(
