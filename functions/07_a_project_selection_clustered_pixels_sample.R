@@ -7,6 +7,40 @@ library(tidyr)
 
 project_selection <- function(yield_carbon_ratio,n_projects) {
   
+  select_non_overlapping_projects <- function(projects, n_projects, decreasing = FALSE,
+                                              used_coords = character()) {
+    ordered_projects <- projects[order(projects[["summed_value"]],
+                                       decreasing = decreasing), , drop = FALSE]
+    
+    selected_rows <- integer(0)
+    
+    for (project_i in seq_len(nrow(ordered_projects))) {
+      project_coords <- trimws(unlist(strsplit(ordered_projects$coordinates[project_i],
+                                               ";", fixed = TRUE)))
+      project_coords <- unique(gsub("\\s+", "", project_coords))
+      project_coords <- project_coords[!is.na(project_coords) & nzchar(project_coords)]
+      
+      if (length(project_coords) > 0 && !any(project_coords %in% used_coords)) {
+        selected_rows <- c(selected_rows, project_i)
+        used_coords <- c(used_coords, project_coords)
+      }
+      
+      if (length(selected_rows) == n_projects) {
+        break
+      }
+    }
+    
+    if (length(selected_rows) < n_projects) {
+      stop("Only ", length(selected_rows), " non-overlapping projects were available, ",
+           "but ", n_projects, " were requested.")
+    }
+    
+    list(
+      projects = ordered_projects[selected_rows, , drop = FALSE],
+      used_coords = used_coords
+    )
+  }
+  
   # yield
   
   yield_curr <- rast("variables/beef_yield_kg_ha_2021_albers_1km.tif")
@@ -19,9 +53,14 @@ project_selection <- function(yield_carbon_ratio,n_projects) {
   # land value
   land_value <- rast("variables/land_value_2023_albers_1km.tif")
   
-  # choose min projects (bottom 1000)
-  min <- yield_carbon_ratio[order(yield_carbon_ratio[["summed_value"]]), ][1:n_projects, ]
-  max <-  yield_carbon_ratio[order(yield_carbon_ratio[["summed_value"]], decreasing = TRUE), ][1:n_projects, ]
+  # choose non-overlapping projects from the bottom and top of the distribution
+  min_selection <- select_non_overlapping_projects(yield_carbon_ratio, n_projects)
+  min <- min_selection$projects
+  
+  max_selection <- select_non_overlapping_projects(yield_carbon_ratio, n_projects,
+                                                   decreasing = TRUE,
+                                                   used_coords = min_selection$used_coords)
+  max <- max_selection$projects
   
   # add ranking ID
   min$project_rank <- seq(1:n_projects)
