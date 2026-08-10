@@ -9,8 +9,8 @@ library(terra)
 
 walker_data_dir <- "C:/Users/franc/OneDrive - University of Cambridge/Data/Walker_et_al_2022"
 
-forest_threshold <- 0.75
-pasture_threshold <- 0.75
+forest_threshold <- 0.95
+pasture_threshold <- 0.95
 
 output_dir <- "output_tables/reviewers_request"
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
@@ -243,4 +243,4 @@ saveRDS(
   file.path(output_dir, "carbon_share_AGB_BGB_SOC_by_biome_cover.rds")
 )
 
-carbon_summary
+#carbon_summary
