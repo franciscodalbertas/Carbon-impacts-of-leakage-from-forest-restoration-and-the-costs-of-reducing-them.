@@ -32,7 +32,7 @@ y_label = expression("Cost per tonne of CO"[2]*"e (USD)")
 
 
 mean_labels_country <- country %>%
-  mutate(name_biome= if_else(name_biome == "Amazônia","Amazon","Atlantic Forest"),
+  mutate(name_biome= if_else(name_biome == "AmazÃ´nia","Amazon","Atlantic Forest"),
          name_biome = factor(name_biome,levels = c("Atlantic Forest","Amazon"))) %>%
   filter(CO2_cost_COC_USD > 0) %>%
   group_by(name_biome, approach, yield_carbon_ratio) %>%
@@ -56,7 +56,7 @@ annotation_df_country <- annotation_df_country%>%
 
 # country
 annotation_df_symbol_country <- annotation_df_country
-annotation_df_symbol_country$label <- "×"
+annotation_df_symbol_country$label <- "Ã—"
 annotation_df_symbol_country$y <- annotation_df_symbol_country$y *2 
 annotation_df_country$approach <- factor(annotation_df_country$approach,
                                        levels = levels(country$approach))
@@ -66,7 +66,7 @@ annotation_df_symbol_country$approach <- factor(annotation_df_symbol_country$app
 
 plot_abacus_country<- country %>%
   mutate(CO2_cost_COC_USD = if_else(CO2_cost_COC_USD<=0,NA,CO2_cost_COC_USD),
-         name_biome= if_else(name_biome == "Amazônia","Amazon","Atlantic Forest"),
+         name_biome= if_else(name_biome == "AmazÃ´nia","Amazon","Atlantic Forest"),
          name_biome = factor(name_biome,levels = c("Atlantic Forest","Amazon")))%>%
   ggplot(aes(x = yield_carbon_ratio,y = CO2_cost_COC_USD,fill = yield_carbon_ratio))+
   geom_violin()+
@@ -101,7 +101,7 @@ plot_abacus_country<- country %>%
     panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
     axis.text.x = element_blank(),
     axis.ticks.x = element_blank(),
-    # ✅ remove facet label rectangles
+    # remove facet label rectangles
     strip.background = element_blank(),
   )
 
