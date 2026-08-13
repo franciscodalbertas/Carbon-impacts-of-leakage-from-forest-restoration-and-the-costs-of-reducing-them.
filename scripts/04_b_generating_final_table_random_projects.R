@@ -108,7 +108,7 @@ projects<- projects%>%
   ungroup()
 
 # save
-saveRDS(projects,"output_tables/abacus_random_projects_local_biome_country_scale_prj_yield_SCC_3.rds")
+saveRDS(projects,"output_tables/abacus_verra_random_projects_local_biome_country_scale_prj_yield_SCC_3.rds")
 
 
 
