@@ -1,10 +1,15 @@
-# Load packages
+################################################################################
+#### run analysis for local scale
+################################################################################
+# --- Load packages ------------------------------------------------------------
+
 library(dplyr)
 library(terra)
 library(sf)
 library(purrr)
 library(furrr)
 
+#-------------------------------------------------------------------------------
 # calculate leakage consequences for the pool of projects!
 source("functions/12_run_project_features_sample_projects.R")
 
@@ -20,7 +25,7 @@ projects <- readRDS("project_location/project_location_round1_sampled1000project
 # or "FP_zero_growth" - no yield growth, just use current yield for FP
 
 # run analysis for biome scale
-source_type <- "verra" # abacus or verra
+source_type <- "abacus" # abacus or verra
 
 result <- run_leakage_analysis(source_type = source_type, leakage_scale = "biome",projects = projects,
                                FP_type = "capped_FP")
@@ -41,7 +46,7 @@ projects <- readRDS("project_location/project_location_round1_randomsampled1000p
 # add fake yield_carbon_ratio column just to make the function run
 
 projects$yield_carbon_ratio <- "random"
-source_type = "verra"
+source_type = "abacus"
 result2 <- run_leakage_analysis(source_type = source_type,leakage_scale = "biome",
                                 projects = projects,FP_type = "capped_FP")
 

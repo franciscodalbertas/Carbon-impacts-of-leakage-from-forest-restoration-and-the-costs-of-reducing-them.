@@ -12,6 +12,7 @@ library(shadowtext)
 # read results
 df <- readRDS("output_tables/abacus_verra_random_projects_local_biome_country_scale_prj_yield_SCC_3_USD.rds")
 
+
 required_cols <- c(
   "name_biome",
   "approach",
@@ -50,6 +51,15 @@ country <- df %>%
     approach %in% c("ignoring", "no_mitigation")
   )
 
+# country %>%
+#   filter(approach == "no_mitigation")%>%
+#   filter(!is.na(CO2_cost)) %>%
+#   group_by(name_biome,param, approach)%>%
+#     summarise(median_c02 = median(CO2_cost_USD,na.rm = T),
+#               mean_c02 = mean(CO2_cost_USD,na.rm = T))
+#  
+    
+  
 # make it more like figure 4
 y_label <- expression("Cost per tonne of CO"[2]*"e (USD)")
 
@@ -65,11 +75,14 @@ plot_data <- country %>%
   ) %>%
   filter(!is.na(name_biome))
 
+# replaced by the median!!
 mean_labels_country <- plot_data %>%
   filter(!is.na(CO2_cost)) %>%
   group_by(name_biome, approach, source) %>%
-  summarize(mean_cost = mean(CO2_cost, na.rm = TRUE), .groups = "drop") %>%
+  summarize(mean_cost = median(CO2_cost, na.rm = TRUE), .groups = "drop") %>%
   mutate(label_colour = if_else(source == "Verra", "black", "lightgray"))
+
+
 
 panel_labels <- tibble(
   approach = factor(c("ignoring", "no_mitigation"), levels = c("ignoring", "no_mitigation")),
@@ -127,9 +140,9 @@ plot_verra_abacus_country <- plot_data %>%
   scale_colour_manual(
     values = c(
       "Verra" = "gray35",
-      "ABACUS" = "gray70",
+      "ABACUS" = "gray60",
       "black" = "black",
-      "lightgray" = "lightgray"
+      "gray50" = "gray50"
     ),
     breaks = c("Verra", "ABACUS"),
     labels = c("Verra" = "30%", "ABACUS" = "100%"),
@@ -156,11 +169,11 @@ plot_verra_abacus_country <- plot_data %>%
 
 plot_verra_abacus_country
 
-# main text
+
 ggsave(
   filename = "figures/Fig2_carbon_costs_verra_abacus_random.png",
   plot = plot_verra_abacus_country,
   width = 11,
-  height = 7,
+  height = 8,
   units = "cm"
 )

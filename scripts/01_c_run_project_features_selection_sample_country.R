@@ -1,4 +1,9 @@
-# Load packages
+################################################################################
+#### run analysis for country scake
+################################################################################
+
+# --- Load packages ------------------------------------------------------------
+
 library(dplyr)
 library(terra)
 library(sf)
@@ -13,7 +18,7 @@ source("functions/12_run_project_features_sample_projects.R")
 projects <- readRDS("project_location/project_location_round1_sampled1000projects.rds")
 
 # run analysis for country scale
-source_type <- "verra" # verra or abacus!!
+source_type <- "abacus" # verra or abacus!!
 
 # type of yield projection: 
 #"capped_FP" =  projecting future trends 
@@ -47,7 +52,7 @@ projects <- readRDS("project_location/project_location_round1_randomsampled1000p
 # add fake yield_carbon_ratio column just to make the function run
 
 projects$yield_carbon_ratio <- "random"
-source_type <- "verra"
+source_type <- "abacus"
 result2 <- run_leakage_analysis(source_type = source_type,leakage_scale = "country",
                                 projects = projects,FP_type = "capped_FP")
 # save

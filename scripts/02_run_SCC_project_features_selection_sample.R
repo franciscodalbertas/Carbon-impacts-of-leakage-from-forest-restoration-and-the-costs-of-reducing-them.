@@ -4,7 +4,7 @@
 
 # running for cluster scale
 scale <- c("local", "biome", "country") # run for multiple scales (options: "local","biome","country")
-
+#scale <- c("country")
 source_to_read <- "both" # "abacus" or "verra" or "both"
 
 # define discount rate for SCC
@@ -16,7 +16,7 @@ yield_projection <- "yield_prj"  # Options: "yield_nogrow", "yield_prj", "yield_
 
 # for low and high leakage sites -----------------------------------------------
 
-source("functions/13_a_SCC_sample_projects.R", local = TRUE)
+#source("functions/13_a_SCC_sample_projects.R", local = TRUE)
 
 # for random sites -------------------------------------------------------------
 
