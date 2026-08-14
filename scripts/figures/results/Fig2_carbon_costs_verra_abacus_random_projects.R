@@ -19,6 +19,8 @@ required_cols <- c(
   "leakage_scale",
   "mitigation_strategy",
   "param",
+  "coordinates",
+  "final_CO2_balance_corrected",
   "CO2_cost_USD"
 )
 
@@ -67,21 +69,45 @@ plot_data <- country %>%
   mutate(
     CO2_cost = if_else(CO2_cost_USD <= 0, NA_real_, CO2_cost_USD),
     name_biome = case_when(
-      name_biome %in% c("Amazon", "Amazonia", "Amaz\u00f4nia", "Amaz\u00f3nia") ~ "Amazon",
-      name_biome %in% c("Atlantic Forest", "Mata Atlantica", "Mata Atl\u00e2ntica") ~ "Atlantic Forest",
+      grepl("Amaz|Amazon", as.character(name_biome)) ~ "Amazon",
+      grepl("Mata|Atlantic", as.character(name_biome)) ~ "Atlantic Forest",
       TRUE ~ as.character(name_biome)
     ),
     name_biome = factor(name_biome, levels = c("Atlantic Forest", "Amazon"))
   ) %>%
   filter(!is.na(name_biome))
 
-# replaced by the median!!
-mean_labels_country <- plot_data %>%
+# Net carbon balance summary for reporting in the text.
+project_net_co2_balance_table <- plot_data %>%
+  group_by(source, approach, leakage_scale, name_biome, coordinates) %>%
+  summarize(
+    project_median_CO2_balance = median(final_CO2_balance_corrected, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  group_by(source, approach, leakage_scale, name_biome) %>%
+  summarize(
+    median_net_CO2_balance = median(project_median_CO2_balance, na.rm = TRUE),
+    n_projects = n(),
+    n_projects_positive_net_CO2_balance = sum(project_median_CO2_balance > 0, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+saveRDS(
+  project_net_co2_balance_table,
+  "output_tables/Fig2_random_projects_net_median_CO2_balance.rds"
+)
+
+# Median labels and mean points for the plot.
+median_labels_country <- plot_data %>%
   filter(!is.na(CO2_cost)) %>%
   group_by(name_biome, approach, source) %>%
-  summarize(mean_cost = median(CO2_cost, na.rm = TRUE), .groups = "drop") %>%
-  mutate(label_colour = if_else(source == "Verra", "black", "lightgray"))
+  summarize(median_cost = median(CO2_cost, na.rm = TRUE), .groups = "drop") %>%
+  mutate(label_colour = if_else(source == "Verra", "black", "gray60"))
 
+mean_points_country <- plot_data %>%
+  filter(!is.na(CO2_cost)) %>%
+  group_by(name_biome, approach, source) %>%
+  summarize(mean_cost = mean(CO2_cost, na.rm = TRUE), .groups = "drop")
 
 
 panel_labels <- tibble(
@@ -108,11 +134,11 @@ plot_verra_abacus_country <- plot_data %>%
     na.rm = TRUE
   ) +
   shadowtext::geom_shadowtext(
-    data = mean_labels_country,
+    data = median_labels_country,
     aes(
       x = name_biome,
-      y = mean_cost,
-      label = round(mean_cost, 0),
+      y = median_cost,
+      label = round(median_cost, 0),
       group = source,
       colour = label_colour
     ),
@@ -121,6 +147,21 @@ plot_verra_abacus_country <- plot_data %>%
     vjust = 0,
     size = 2.5,
     bg.colour = "white",
+    show.legend = FALSE
+  ) +
+  geom_point(
+    data = mean_points_country,
+    aes(
+      x = name_biome,
+      y = mean_cost,
+      group = source,
+      colour = source
+    ),
+    position = position_dodge(width = dodge_width),
+    inherit.aes = FALSE,
+    shape = 95,
+    size = 2,
+    stroke = 0.35,
     show.legend = FALSE
   ) +
   geom_text(
@@ -142,6 +183,7 @@ plot_verra_abacus_country <- plot_data %>%
       "Verra" = "gray35",
       "ABACUS" = "gray60",
       "black" = "black",
+      "gray60" = "gray60",
       "gray50" = "gray50"
     ),
     breaks = c("Verra", "ABACUS"),

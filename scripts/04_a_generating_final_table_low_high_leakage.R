@@ -5,6 +5,7 @@ library(tidyr)
 
 #-------------------------------------------------------------------------------
 
+# define funtion to read tables
 read_result_table <- function(path) {
   x <- readRDS(path)
   x_list <- unclass(x)
@@ -14,7 +15,6 @@ read_result_table <- function(path) {
 }
 
 # results for high and low projects
-
 all <- list.files(path = "results_with_mitigation/",pattern = "round1",full.names = T)
 
 # get it split by verra or abacus

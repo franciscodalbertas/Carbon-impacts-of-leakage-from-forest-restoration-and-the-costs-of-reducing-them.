@@ -5,3 +5,18 @@
 
 variables/*.tif
 variables/*.zip
+
+results_with_mitigation/*rds
+
+output_tables/hide/*rds
+
+mitigation_locations/*shp
+mitigation_locations/*dbf
+mitigation_locations/*prj
+mitigation_locations/*shx
+
+mitigation_inputs/*rds
+
+figures/*png
+
+figures/*svg

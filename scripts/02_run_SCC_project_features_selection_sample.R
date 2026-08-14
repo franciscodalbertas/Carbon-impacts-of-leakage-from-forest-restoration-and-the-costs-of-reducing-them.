@@ -16,8 +16,8 @@ yield_projection <- "yield_prj"  # Options: "yield_nogrow", "yield_prj", "yield_
 
 # for low and high leakage sites -----------------------------------------------
 
-#source("functions/13_a_SCC_sample_projects.R", local = TRUE)
+source("functions/13_a_SCC_sample_projects.R", local = TRUE)
 
 # for random sites -------------------------------------------------------------
 
-source("functions/13_b_SCC_random_projects.R")
+#source("functions/13_b_SCC_random_projects.R")

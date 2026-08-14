@@ -1,11 +1,12 @@
-# with forgone production calculated, model where leakage is happening and quantify
+# *** note *** 
+# with forgone production calculated, this script model where leakage is happening and quantify
 # consequences in terms of land use
 
 
 
 spatial_leakage <- function(projects, scale, mitigation_type = NULL){
   
-  # for each project, at the cluster scale, I need to mask the immediate regions
+  # for each project, at the cluster scale, mask the immediate regions
   # and calculate pixels to leak based on prob. def + land value
   
   
@@ -13,7 +14,7 @@ spatial_leakage <- function(projects, scale, mitigation_type = NULL){
   immediate_regions_sp <- readRDS("input_tables/imediate_regions_am_af.rds")
   immediate_regions <- readRDS("input_tables/BP_regions_avg_yield_2021.rds")
   names(immediate_regions)[1] <- "code_immediate"
-  # 2: filter immediate regions selected by projects! 
+  # filter immediate regions selected by projects! 
   immediate_regions_f <- filter(immediate_regions,code_immediate %in% as.character(projects$code_immediate))
   # summarise fp per immediate region
   immediate_regions_sp$code_immediate <- as.character(immediate_regions_sp$code_immediate)
@@ -42,32 +43,28 @@ spatial_leakage <- function(projects, scale, mitigation_type = NULL){
   # raster with forest cover 
   fc <- rast("variables/forest_cover_albers_1km_2021.tif")
   
-  # raster with prob. deforestation (diff.resolution, I need to degrade it)
+  # raster with prob. deforestation
   def <- rast("variables/Williams_pred_to_increase_pasture_albers_1km_pj.tif")
   
   # raster with land value
   landvalue <- rast("variables/land_value_2023_albers_1km.tif")
 
-  # raster with average yield from moving-window
+  # raster with average yield attributable to pastures from moving-window
   yield <- rast("variables/mean_yield_10km_moving_window.tif")
 
-  # current carbon
+  # current carbon (only AGB)
   current <- rast("variables/AGC_current_Walter_22_layer_albers_1km_res.tif")
 
-  # prob. nat. regeneration (added just in case. should not be used here probably)
+  # prob. nat. regeneration
   nat_reg <- rast("variables/prob_nat_regeneration_all_vegetation_albers1km_pj.tif")
 
   biome_regions <- NULL
   country_target <- NULL
   
-  # here I need to modify, for each immediate region
-  
   immediate_regions_ls <- unique(total_fp$code_immediate)
   
   rslt_list <- list()
   candidate_cache <- list()
-  
-  # I am loosing the info of biome, yield_carbon ratio
   
   for(i in seq_along(immediate_regions_ls)){
     
@@ -145,11 +142,21 @@ spatial_leakage <- function(projects, scale, mitigation_type = NULL){
                                "yield_kg_ha",
                                "prob_nat_reg")
       
+      # updated correction suggested by r#3 ------------------------------------
+      # ****  add BGB to the leakage calculation ****
+      # 0.24 was obtained by calculating the delta diff between BGB in pastures
+      # and forests and converged in both AM and AF
+      #-------------------------------------------------------------------------
+      values_df <- values_df %>%
+        mutate(
+          carbon_ton_ha_agb = carbon_ton_ha,
+          carbon_ton_ha = carbon_ton_ha * 1.24
+        )
+      
+      #-------------------------------------------------------------------------
       # add production - this is how much each forested area could produce
       
       values_df$beef_pot_prod_kg <- values_df$forest_area * values_df$yield_kg_ha 
-      
-      
       
       # arrange in decreasing order of prob. of conversion and increasing order of
       # land value

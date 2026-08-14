@@ -19,6 +19,8 @@ required_cols <- c(
   "leakage_scale",
   "mitigation_strategy",
   "yield_carbon_ratio",
+  "coordinates",
+  "final_CO2_balance_corrected_minus_COC",
   "CO2_cost_COC_USD"
 )
 
@@ -72,7 +74,38 @@ plot_ready_country <- country %>%
   ) %>%
   filter(!is.na(name_biome))
 
-mean_labels_country <- plot_ready_country %>%
+# Net carbon balance summary for reporting in the text.
+project_net_co2_balance_table <- plot_ready_country %>%
+  group_by(source, approach, leakage_scale, name_biome, yield_carbon_ratio, coordinates) %>%
+  summarize(
+    project_median_CO2_balance = median(final_CO2_balance_corrected_minus_COC, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  group_by(source, approach, leakage_scale, name_biome, yield_carbon_ratio) %>%
+  summarize(
+    median_net_CO2_balance = median(project_median_CO2_balance, na.rm = TRUE),
+    n_projects = n(),
+    n_projects_positive_net_CO2_balance = sum(project_median_CO2_balance > 0, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+saveRDS(
+  project_net_co2_balance_table,
+  "output_tables/Fig3_projects_net_median_CO2_balance_COC_and_PNR.rds"
+)
+
+# Median labels and mean points for the plot.
+median_labels_country <- plot_ready_country %>%
+  filter(!is.na(CO2_cost_COC_USD)) %>%
+  group_by(name_biome, approach, yield_carbon_ratio, source, x_plot) %>%
+  summarize(
+    n_positive = n(),
+    median_cost = median(CO2_cost_COC_USD, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  filter(n_positive >= 2)
+
+mean_points_country <- plot_ready_country %>%
   filter(!is.na(CO2_cost_COC_USD)) %>%
   group_by(name_biome, approach, yield_carbon_ratio, source, x_plot) %>%
   summarize(
@@ -127,11 +160,11 @@ plot_abacus_verra_country <- plot_ready_country %>%
     na.rm = TRUE
   ) +
   shadowtext::geom_shadowtext(
-    data = mean_labels_country,
+    data = median_labels_country,
     aes(
       x = x_plot,
-      y = mean_cost,
-      label = round(mean_cost, 0),
+      y = median_cost,
+      label = round(median_cost, 0),
       colour = source
     ),
     inherit.aes = FALSE,
@@ -139,6 +172,20 @@ plot_abacus_verra_country <- plot_ready_country %>%
     size = 2.5,
     bg.colour = "white",
     g.r = 0.2,
+    show.legend = FALSE
+  ) +
+  geom_point(
+    data = mean_points_country,
+    aes(
+      x = x_plot,
+      y = mean_cost,
+      colour = source
+    ),
+    inherit.aes = FALSE,
+    shape = 8, # before it was 95
+    size = 0.8,
+    colour = "red",
+    stroke = 0.35,
     show.legend = FALSE
   ) +
   geom_text(
@@ -216,6 +263,6 @@ ggsave(
   filename = "figures/Fig3_abacus_verra.png",
   plot = plot_abacus_verra_country,
   width = 14,
-  height = 11,
+  height = 12,
   units = "cm"
 )
