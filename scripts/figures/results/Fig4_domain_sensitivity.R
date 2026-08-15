@@ -7,8 +7,8 @@ library(scales)
 
 df <- readRDS("output_tables/abacus_high_low_leakage_projects_r1_local_biome_country_scale_prj_yield_SCC_3_USD.rds")
 
-# Compute means
-medians <- df %>%
+# Compute labels
+mean_labels <- df %>%
   # focus on carbon optimization
   mutate(name_biome= if_else(name_biome == "Amazônia","Amazon","Atlantic Forest"),
          yield_carbon_ratio =  if_else(yield_carbon_ratio=="max","high","low"),
@@ -17,7 +17,20 @@ medians <- df %>%
          CO2_cost_COC_USD>0,
          ) %>%
   group_by(leakage_scale, yield_carbon_ratio,name_biome) %>%
-  summarise(median_cost = median(CO2_cost_COC_USD))
+  summarise(mean_cost = mean(CO2_cost_COC_USD, na.rm = TRUE),
+            median_cost = median(CO2_cost_COC_USD),
+            .groups = "drop")
+
+medians <- df %>%
+  # focus on carbon optimization
+  mutate(name_biome= if_else(name_biome == "AmazÃ´nia","Amazon","Atlantic Forest"),
+         yield_carbon_ratio =  if_else(yield_carbon_ratio=="max","high","low"),
+         name_biome = factor(name_biome,levels = c("Atlantic Forest","Amazon"))) %>%
+  filter(mitigation_strategy =="optimize_carbon",
+         CO2_cost_COC_USD>0,
+         ) %>%
+  group_by(leakage_scale, yield_carbon_ratio,name_biome) %>%
+  summarise(median_cost = median(CO2_cost_COC_USD), .groups = "drop")
 
 y_label = expression("Cost per tonne of CO"[2]*"e (USD)")
 
@@ -26,7 +39,7 @@ y_label = expression("Cost per tonne of CO"[2]*"e (USD)")
 df <- df %>%
   mutate(leakage_scale = if_else(leakage_scale=="cluster","local",leakage_scale))
 
-medians <- medians %>%
+mean_labels <- mean_labels %>%
   mutate(leakage_scale = if_else(leakage_scale=="cluster","local",leakage_scale))
 
 
@@ -47,12 +60,21 @@ cost_scale <- df %>%
     geom_violin() +
     scale_fill_manual(values = c("low" = "darkgreen",
                                  "high" = "lightgreen"),
-                      name = "Yield/carbon ratio",
-                      #labels = c("min" = "low",
-                      #           "max" = "high")
+                      name = NULL,
+                      breaks = c("low", "high"),
+                      labels = c("low" = "30%",
+                                 "high" = "100%")
                       ) +
   scale_y_continuous(trans = "log10",labels = comma)+
-  shadowtext::geom_shadowtext(data = medians,
+  geom_text(data = mean_labels,
+            aes(x = leakage_scale,
+                y = mean_cost,
+                label = "*"),
+            inherit.aes = FALSE,
+            vjust = -0.45,
+            size = 3,
+            colour = "red") +
+  shadowtext::geom_shadowtext(data = mean_labels,
             aes(x = leakage_scale, 
                 y = median_cost, 
                 label = round(median_cost, 0)),
@@ -68,7 +90,7 @@ cost_scale <- df %>%
          title = "",
          subtitle = "") +
   theme(
-    legend.position = "none",
+    legend.position = "top",
     text = element_text(size = 7),
     panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
     # ✅ remove facet label rectangles

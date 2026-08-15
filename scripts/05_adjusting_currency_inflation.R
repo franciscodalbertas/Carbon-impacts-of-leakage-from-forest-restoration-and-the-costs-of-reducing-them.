@@ -5,7 +5,7 @@ df <- readRDS("output_tables/abacus_high_low_leakage_projects_r1_local_biome_cou
 
 df_random <- readRDS("output_tables/abacus_verra_random_projects_local_biome_country_scale_prj_yield_SCC_3.rds")
 
-df_verra <- readRDS("output_tables/verra_high_low_leakage_projects_r1_country_scale_prj_yield_SCC_3.rds")
+df_verra <- readRDS("output_tables/verra_high_low_leakage_projects_r1_local_biome_country_scale_prj_yield_SCC_3.rds")
 
 IPCA_2021 <- 1.0579
 IPCA_2024 <- 1.1583
@@ -88,4 +88,4 @@ df_verra <- df_verra %>%
 # save
 saveRDS(df,"output_tables/abacus_high_low_leakage_projects_r1_local_biome_country_scale_prj_yield_SCC_3_USD.rds")
 saveRDS(df_random,"output_tables/abacus_verra_random_projects_local_biome_country_scale_prj_yield_SCC_3_USD.rds")
-saveRDS(df_verra,"output_tables/verra_high_low_leakage_projects_r1_country_scale_prj_yield_SCC_3_USD.rds")
+saveRDS(df_verra,"output_tables/verra_high_low_leakage_projects_r1_local_biome_country_scale_prj_yield_SCC_3_USD.rds")

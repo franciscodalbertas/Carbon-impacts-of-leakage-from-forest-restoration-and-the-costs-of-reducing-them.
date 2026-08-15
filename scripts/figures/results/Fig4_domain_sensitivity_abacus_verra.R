@@ -6,7 +6,7 @@ library(scales)
 #-------------------------------------------------------------------------------
 
 abacus <- readRDS("output_tables/abacus_high_low_leakage_projects_r1_local_biome_country_scale_prj_yield_SCC_3_USD.rds")
-verra <- readRDS("output_tables/verra_high_low_leakage_projects_r1_country_scale_prj_yield_SCC_3_USD.rds")
+verra <- readRDS("output_tables/verra_high_low_leakage_projects_r1_local_biome_country_scale_prj_yield_SCC_3_USD.rds")
 
 required_cols <- c(
   "name_biome",
@@ -104,13 +104,13 @@ cost_scale_abacus_verra <- plot_data %>%
     values = c("Verra" = 1, "ABACUS" = 0.45),
     breaks = c("Verra", "ABACUS"),
     labels = c("Verra" = "30%", "ABACUS" = "100%"),
-    name = "Leakage parameter"
+    name = ""
   ) +
   scale_colour_manual(
     values = c("Verra" = "black", "ABACUS" = "gray60"),
     breaks = c("Verra", "ABACUS"),
     labels = c("Verra" = "30%", "ABACUS" = "100%"),
-    name = "Leakage parameter"
+    name = ""
   ) +
   guides(
     alpha = guide_legend(override.aes = list(fill = "white", colour = c("black", "gray60"))),
@@ -138,6 +138,6 @@ ggsave(
   filename = "figures/Fig4_abacus_verra.png",
   plot = cost_scale_abacus_verra,
   width = 14,
-  height = 11,
+  height = 13,
   units = "cm"
 )

@@ -144,17 +144,23 @@ saveRDS(projects,"output_tables/abacus_high_low_leakage_projects_r1_local_biome_
 
 # --- generating table for verra ---
 
+local_scale_verra <- grep(pattern = "local_scale",x = verra,value = T)
+biome_scale_verra <- grep(pattern = "biome_scale",x = verra,value = T)
 country_scale_verra <- grep(pattern = "country_scale",x = verra,value = T)
 
 # read files
+local_l_verra <- lapply(local_scale_verra, read_result_table)
+biome_l_verra <- lapply(biome_scale_verra, read_result_table)
 country_l_verra <- lapply(country_scale_verra, read_result_table) 
 
 # combine into a single df
+local_df_verra <- do.call(rbind,local_l_verra)
+biome_df_verra <- do.call(rbind,biome_l_verra)
 country_df_verra <- do.call(rbind,country_l_verra)
 
 # create ignoring scenario (scale does not matter)
 
-projects_ignoring_verra <- country_df_verra %>%
+projects_ignoring_verra <- local_df_verra %>%
   mutate(
     mitigation_strategy = "ignoring",
     mitigation_costs_reais_50y = 0,
@@ -164,6 +170,24 @@ projects_ignoring_verra <- country_df_verra %>%
   )%>%
   distinct()
 
+
+projects_no_mitigation_local_verra <- local_df_verra %>%
+  mutate(
+    # leakage is accounted but not mitigated
+    mitigation_strategy = "no_mitigation",
+    mitigation_costs_reais_50y = 0,
+    mitigation_scale = "no_mitigation",
+    approach = "no_mitigation") %>%
+  distinct()
+
+projects_no_mitigation_biome_verra <- biome_df_verra %>%
+  mutate(
+    # leakage is accounted but not mitigated
+    mitigation_strategy = "no_mitigation",
+    mitigation_costs_reais_50y = 0,
+    mitigation_scale = "no_mitigation",
+    approach = "no_mitigation") %>%
+  distinct()
 
 projects_no_mitigation_country_verra <- country_df_verra %>%
   mutate(
@@ -178,11 +202,13 @@ projects_no_mitigation_country_verra <- country_df_verra %>%
 
 # combine 
 # this include the ignoring -- as scale does not matter
-projects_country_verra <- rbind(country_df_verra,projects_ignoring_verra,projects_no_mitigation_country_verra) 
+projects_local_verra <- rbind(local_df_verra,projects_ignoring_verra,projects_no_mitigation_local_verra) 
+projects_biome_verra <- rbind(biome_df_verra,projects_no_mitigation_biome_verra) 
+projects_country_verra <- rbind(country_df_verra,projects_no_mitigation_country_verra) 
 
 
 # add column with final carbon balance based on the scenario
-projects_verra <- projects_country_verra %>%
+projects_verra <- rbind(projects_local_verra,projects_biome_verra,projects_country_verra) %>%
   mutate(
     # with carbon corrected for the SCC!
     final_CO2_balance_corrected =
@@ -227,5 +253,5 @@ projects_verra<- projects_verra%>%
   ungroup()
 
 # save
-saveRDS(projects_verra,"output_tables/verra_high_low_leakage_projects_r1_country_scale_prj_yield_SCC_3.rds")
+saveRDS(projects_verra,"output_tables/verra_high_low_leakage_projects_r1_local_biome_country_scale_prj_yield_SCC_3.rds")
 
