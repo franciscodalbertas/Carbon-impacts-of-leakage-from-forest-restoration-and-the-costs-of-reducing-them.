@@ -23,16 +23,23 @@ verra <- grep(pattern = "Verra",x = all,value = T)
 # abacus or ABACUS
 abacus <- grep(pattern = "abacus", x = all, value = TRUE, ignore.case = TRUE)
 
-# --- generate single table for abacus ---
-
+# --- filter scale ---
+# this is for abacus!!
 local_scale <- grep(pattern = "local_scale",x = abacus,value = T)
 biome_scale <- grep(pattern = "biome_scale",x = abacus,value = T)
 country_scale <- grep(pattern = "country_scale",x = abacus,value = T)
 
+# --- generate single table for abacus ---
+
+local_scale_scc3 <- grep(pattern = "SCC_3",x = local_scale,value = T)
+biome_scale_scc3 <- grep(pattern = "SCC_3",x = biome_scale,value = T)
+country_scale_scc3 <- grep(pattern = "SCC_3",x = country_scale,value = T)
+
+
 # read files
-local_l <- lapply(local_scale, read_result_table)
-biome_l <- lapply(biome_scale, read_result_table) 
-country_l <- lapply(country_scale, read_result_table) 
+local_l <- lapply(local_scale_scc3, read_result_table)
+biome_l <- lapply(biome_scale_scc3, read_result_table) 
+country_l <- lapply(country_scale_scc3, read_result_table) 
 
 # combine into a single df
 local_df <- do.call(rbind,local_l)
@@ -148,10 +155,13 @@ local_scale_verra <- grep(pattern = "local_scale",x = verra,value = T)
 biome_scale_verra <- grep(pattern = "biome_scale",x = verra,value = T)
 country_scale_verra <- grep(pattern = "country_scale",x = verra,value = T)
 
+# filter for 3%
+country_scale_verra_scc3 <- grep(pattern = "SCC_3",x = country_scale_verra,value = T)
+
 # read files
 local_l_verra <- lapply(local_scale_verra, read_result_table)
 biome_l_verra <- lapply(biome_scale_verra, read_result_table)
-country_l_verra <- lapply(country_scale_verra, read_result_table) 
+country_l_verra <- lapply(country_scale_verra_scc3, read_result_table) 
 
 # combine into a single df
 local_df_verra <- do.call(rbind,local_l_verra)
