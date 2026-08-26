@@ -133,6 +133,22 @@ plot_verra_abacus_country <- plot_data %>%
     linewidth = 0.4,
     na.rm = TRUE
   ) +
+  geom_point(
+    data = mean_points_country,
+    aes(
+      x = name_biome,
+      y = mean_cost,
+      group = source,
+      colour = source
+    ),
+    position = position_dodge(width = dodge_width),
+    inherit.aes = FALSE,
+    shape = 8,
+    size = 0.8,
+    colour = "red",
+    stroke = 0.35,
+    show.legend = FALSE
+  ) +
   shadowtext::geom_shadowtext(
     data = median_labels_country,
     aes(
@@ -147,21 +163,6 @@ plot_verra_abacus_country <- plot_data %>%
     vjust = 0,
     size = 2.5,
     bg.colour = "white",
-    show.legend = FALSE
-  ) +
-  geom_point(
-    data = mean_points_country,
-    aes(
-      x = name_biome,
-      y = mean_cost,
-      group = source,
-      colour = source
-    ),
-    position = position_dodge(width = dodge_width),
-    inherit.aes = FALSE,
-    shape = 95,
-    size = 2,
-    stroke = 0.35,
     show.legend = FALSE
   ) +
   geom_text(
