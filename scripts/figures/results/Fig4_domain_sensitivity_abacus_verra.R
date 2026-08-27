@@ -55,7 +55,16 @@ plot_data <- df %>%
     !is.na(name_biome)
   )
 
-mean_labels <- plot_data %>%
+median_labels <- plot_data %>%
+  group_by(leakage_scale, yield_carbon_ratio, name_biome, source) %>%
+  summarise(
+    n_positive = n(),
+    median_cost = median(CO2_cost_COC_USD, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  filter(n_positive >= 2)
+
+mean_points <- plot_data %>%
   group_by(leakage_scale, yield_carbon_ratio, name_biome, source) %>%
   summarise(
     n_positive = n(),
@@ -63,6 +72,17 @@ mean_labels <- plot_data %>%
     .groups = "drop"
   ) %>%
   filter(n_positive >= 2)
+
+panel_labels <- expand.grid(
+  name_biome = c("Atlantic Forest", "Amazon"),
+  yield_carbon_ratio = c("high", "low"),
+  stringsAsFactors = FALSE
+) %>%
+  mutate(
+    name_biome = factor(name_biome, levels = levels(plot_data$name_biome)),
+    yield_carbon_ratio = factor(yield_carbon_ratio, levels = levels(plot_data$yield_carbon_ratio)),
+    panel_label = c("A", "C", "B", "D")
+  )
 
 dodge_width <- 0.75
 violin_width <- 0.8
@@ -81,11 +101,11 @@ cost_scale_abacus_verra <- plot_data %>%
     na.rm = TRUE
   ) +
   shadowtext::geom_shadowtext(
-    data = mean_labels,
+    data = median_labels,
     aes(
       x = leakage_scale,
-      y = mean_cost,
-      label = round(mean_cost, 0),
+      y = median_cost,
+      label = round(median_cost, 0),
       group = source,
       colour = source
     ),
@@ -95,6 +115,30 @@ cost_scale_abacus_verra <- plot_data %>%
     bg.colour = "white",
     bg.r = 0.2,
     show.legend = FALSE
+  ) +
+  geom_point(
+    data = mean_points,
+    aes(
+      x = leakage_scale,
+      y = mean_cost,
+      group = source
+    ),
+    position = position_dodge(width = dodge_width),
+    inherit.aes = FALSE,
+    shape = 8,
+    size = 0.8,
+    colour = "red",
+    stroke = 0.35,
+    show.legend = FALSE
+  ) +
+  geom_text(
+    data = panel_labels,
+    aes(x = -Inf, y = Inf, label = panel_label),
+    inherit.aes = FALSE,
+    hjust = -0.35,
+    vjust = 1.15,
+    fontface = "bold",
+    size = 3
   ) +
   scale_fill_manual(
     values = c("high" = "lightgreen", "low" = "darkgreen"),

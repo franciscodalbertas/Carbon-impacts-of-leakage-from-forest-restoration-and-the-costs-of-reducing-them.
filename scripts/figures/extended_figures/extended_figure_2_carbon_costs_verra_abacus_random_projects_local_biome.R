@@ -141,8 +141,9 @@ plot_verra_abacus_local_biome <- plot_data %>%
     ),
     position = position_dodge(width = dodge_width),
     inherit.aes = FALSE,
-    shape = 95,
-    size = 2,
+    shape = 8,
+    size = 0.8,
+    colour = "red",
     stroke = 0.35,
     show.legend = FALSE
   ) +
