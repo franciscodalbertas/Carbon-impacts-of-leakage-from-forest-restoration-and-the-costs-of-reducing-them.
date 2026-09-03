@@ -17,6 +17,7 @@ selected_local_domain_title <- "Local domain: Eunapolis - Porto Seguro"
 pixel_size <- 1000
 
 local_panel_levels <- c(
+  "A) Local domain",
   "B) All potential projects",
   "C) Sampled projects",
   "D) Leakage pixels",
@@ -32,7 +33,7 @@ line_legend_levels <- c(
 
 line_legend_colours <- c(
   "All potential projects" = "#4E79A7",
-  "Sampled projects" = "#D55E00",
+  "Sampled projects" = "black",
   "Leakage pixels" = "#D73027",
   "Selected mitigation pixels" = "#009E73"
 )
@@ -462,135 +463,152 @@ locator_map_eunapolis <- ggplot() +
   labs(
     title = paste0("A) ", selected_local_domain_title)
   ) +
-  theme_void(base_size = 8) +
+  theme_void(base_size = 9) +
   theme(
-    plot.title = element_text(face = "bold", size = 9, hjust = 0.5, margin = margin(b = 4)),
-    plot.margin = margin(1, 1, 0, 1)
+    plot.title = element_text(face = "bold", size = 10, hjust = 0.5, margin = margin(b = 4)),
+    plot.margin = margin(2, 2, 2, 2)
   )
 
-project_map_eunapolis <- ggplot() +
-  geom_raster(
-    data = local_leakage$probability,
-    aes(x = x, y = y, fill = prob_clearance)
-  ) +
-  geom_sf(
-    data = selected_immediate_region_panels,
-    fill = NA,
-    colour = "#303030",
-    linewidth = 0.45,
-    inherit.aes = FALSE
-  ) +
-  geom_sf(
-    data = all_panel,
-    aes(colour = project_set),
-    fill = NA,
-    linewidth = 0.15,
-    alpha = 0.55
-  ) +
-  geom_sf(
-    data = sampled_context_panel,
-    colour = "grey82",
-    fill = NA,
-    linewidth = 0.12,
-    alpha = 0.45
-  ) +
-  geom_sf(
-    data = sampled_panel,
-    aes(colour = project_set),
-    fill = NA,
-    linewidth = 0.35,
-    alpha = 0.95
-  ) +
-  geom_sf(
-    data = sampled_context_leakage_panel,
-    colour = "grey82",
-    fill = NA,
-    linewidth = 0.12,
-    alpha = 0.45
-  ) +
-  geom_sf(
-    data = selected_leakage_outlines,
-    aes(colour = project_set),
-    fill = NA,
-    linewidth = 0.45,
-    alpha = 0.95
-  ) +
-  geom_sf(
-    data = example_project_leakage_panel,
-    aes(colour = project_set),
-    fill = NA,
-    linewidth = 0.45,
-    alpha = 0.95
-  ) +
-  geom_sf(
-    data = example_project_mitigation_panel,
-    aes(colour = project_set),
-    fill = NA,
-    linewidth = 0.45,
-    alpha = 0.95
-  ) +
-  geom_sf(
-    data = example_mitigation_outlines,
-    aes(colour = project_set),
-    fill = NA,
-    linewidth = 0.25,
-    alpha = 0.75
-  ) +
-  facet_wrap(~panel, nrow = 2) +
-  scale_fill_viridis_c(
-    option = "viridis",
-    name = "Probability of conversion",
-    labels = scales::label_number(accuracy = 0.01)
-  ) +
-  scale_colour_manual(
-    values = line_legend_colours,
-    breaks = line_legend_levels,
-    limits = line_legend_levels,
-    drop = FALSE
-  ) +
-  coord_sf(expand = FALSE) +
-  labs(
-    colour = NULL,
-    x = NULL,
-    y = NULL
-  ) +
-  guides(
-    colour = guide_legend(
-      order = 1,
-      override.aes = list(linewidth = 0.8, alpha = 1)
-    ),
-    fill = guide_colourbar(
-      order = 2,
-      barwidth = unit(3.4, "cm"),
-      barheight = unit(0.35, "cm"),
-      title.position = "top"
+panel_data <- function(data, panel_name) {
+  data %>%
+    filter(panel == panel_name)
+}
+
+make_project_panel <- function(panel_name, show_legend = FALSE) {
+  ggplot() +
+    geom_raster(
+      data = panel_data(local_leakage$probability, panel_name),
+      aes(x = x, y = y, fill = prob_clearance)
+    ) +
+    geom_sf(
+      data = panel_data(selected_immediate_region_panels, panel_name),
+      fill = NA,
+      colour = "#303030",
+      linewidth = 0.45,
+      inherit.aes = FALSE
+    ) +
+    geom_sf(
+      data = panel_data(all_panel, panel_name),
+      aes(colour = project_set),
+      fill = NA,
+      linewidth = 0.15,
+      alpha = 0.55
+    ) +
+    geom_sf(
+      data = panel_data(sampled_context_panel, panel_name),
+      colour = "grey82",
+      fill = NA,
+      linewidth = 0.12,
+      alpha = 0.45
+    ) +
+    geom_sf(
+      data = panel_data(sampled_panel, panel_name),
+      aes(colour = project_set),
+      fill = NA,
+      linewidth = 0.35,
+      alpha = 0.95
+    ) +
+    geom_sf(
+      data = panel_data(sampled_context_leakage_panel, panel_name),
+      colour = "grey82",
+      fill = NA,
+      linewidth = 0.12,
+      alpha = 0.45
+    ) +
+    geom_sf(
+      data = panel_data(selected_leakage_outlines, panel_name),
+      aes(colour = project_set),
+      fill = NA,
+      linewidth = 0.85,
+      alpha = 0.95
+    ) +
+    geom_sf(
+      data = panel_data(example_project_leakage_panel, panel_name),
+      aes(colour = project_set),
+      fill = NA,
+      linewidth = 1.1,
+      alpha = 0.95
+    ) +
+    geom_sf(
+      data = panel_data(example_project_mitigation_panel, panel_name),
+      aes(colour = project_set),
+      fill = NA,
+      linewidth = 0.85,
+      alpha = 0.95
+    ) +
+    geom_sf(
+      data = panel_data(example_mitigation_outlines, panel_name),
+      aes(colour = project_set),
+      fill = NA,
+      linewidth = 0.85,
+      alpha = 0.75
+    ) +
+    scale_fill_viridis_c(
+      option = "viridis",
+      name = "Probability of conversion",
+      labels = scales::label_number(accuracy = 0.01)
+    ) +
+    scale_colour_manual(
+      values = line_legend_colours,
+      breaks = line_legend_levels,
+      limits = line_legend_levels,
+      drop = FALSE
+    ) +
+    coord_sf(expand = FALSE) +
+    labs(
+      title = panel_name,
+      colour = NULL,
+      x = NULL,
+      y = NULL
+    ) +
+    guides(
+      colour = guide_legend(
+        order = 1,
+        nrow = 2,
+        byrow = TRUE,
+        override.aes = list(linewidth = 0.8, alpha = 1)
+      ),
+      fill = guide_colourbar(
+        order = 2,
+        barwidth = unit(4.2, "cm"),
+        barheight = unit(0.4, "cm"),
+        title.position = "top"
+      )
+    ) +
+    theme_minimal(base_size = 9) +
+    theme(
+      legend.position = if (show_legend) "bottom" else "none",
+      legend.box = "vertical",
+      legend.margin = margin(0, 0, 0, 0),
+      legend.box.margin = margin(0, 0, 0, 0),
+      axis.text = element_blank(),
+      axis.ticks = element_blank(),
+      panel.grid = element_blank(),
+      plot.title = element_text(face = "bold", size = 10, hjust = 0.5, margin = margin(b = 4)),
+      plot.margin = margin(2, 2, 2, 2)
     )
-  ) +
-  theme_minimal(base_size = 8) +
-  theme(
-    legend.position = "bottom",
-    legend.box = "vertical",
-    legend.margin = margin(0, 0, 0, 0),
-    legend.box.margin = margin(0, 0, 0, 0),
-    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
-    panel.grid.major = element_line(colour = "grey90", linewidth = 0.2),
-    panel.spacing = unit(0.45, "lines"),
-    strip.text = element_text(face = "bold", size = 9),
-    plot.margin = margin(0, 1, 1, 1)
-  )
+}
+
+legend_panel <- ggpubr::as_ggplot(
+  ggpubr::get_legend(make_project_panel("D) Leakage pixels", show_legend = TRUE))
+)
 
 panel <- ggarrange(
   locator_map_eunapolis,
-  project_map_eunapolis,
-  nrow = 2,
-  heights = c(1, 2)
+  make_project_panel("B) All potential projects"),
+  make_project_panel("C) Sampled projects"),
+  make_project_panel("D) Leakage pixels"),
+  make_project_panel("E) Example local mitigation"),
+  legend_panel,
+  nrow = 3,
+  ncol = 2
 )
 
 ggsave(
   filename = "figures/response_reviewers/project_map_with_leakage_probability_eunapolis.png",
   plot = panel,
-  width = 14.5,
-  height = 17,
+  width = 16,
+  height = 22,
   units = "cm",
   dpi = 300,
   bg = "white"

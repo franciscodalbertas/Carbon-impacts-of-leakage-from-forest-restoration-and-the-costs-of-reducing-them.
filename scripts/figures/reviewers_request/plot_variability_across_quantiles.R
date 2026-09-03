@@ -293,7 +293,7 @@ average <- ggplot(
     colour = "grey40"
   ) +
   geom_hline(
-    yintercept = c(-5, 5),
+    yintercept = c(-10, 10),
     linetype = "dashed",
     colour = "grey40"
   ) +
@@ -345,7 +345,7 @@ high <- ggplot(
     colour = "grey40"
   ) +
   geom_hline(
-    yintercept = c(-5, 5),
+    yintercept = c(-10, 10),
     linetype = "dashed",
     colour = "grey40"
   ) +
@@ -398,7 +398,7 @@ low <- ggplot(
     colour = "grey40"
   ) +
   geom_hline(
-    yintercept = c(-5, 5),
+    yintercept = c(-10, 10),
     linetype = "dashed",
     colour = "grey40"
   ) +

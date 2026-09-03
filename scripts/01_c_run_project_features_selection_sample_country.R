@@ -24,10 +24,9 @@ source_type <- "abacus" # verra or abacus!!
 #"capped_FP" =  projecting future trends 
 # "FP_carrying_capacity" # all grow
 # or "FP_zero_growth"!! # none grow
-
-FP_type = "capped_FP"; yield_name = "yield_prj"
+# FP_type = "capped_FP"; yield_name = "yield_prj"
 #FP_type = "FP_zero_growth"; yield_name = "yield_nogrow"
-#FP_type = "FP_carrying_capacity"; yield_name = "yield_carrying"
+FP_type = "FP_carrying_capacity"; yield_name = "yield_carrying"
 
 
 result <- run_leakage_analysis(source_type = source_type, leakage_scale = "country",projects = projects,
