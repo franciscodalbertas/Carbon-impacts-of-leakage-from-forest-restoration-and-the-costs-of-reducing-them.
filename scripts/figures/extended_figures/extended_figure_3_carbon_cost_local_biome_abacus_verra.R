@@ -169,6 +169,21 @@ plot_abacus_verra_local_biome <- plot_ready_local_biome %>%
     linewidth = 0.4,
     na.rm = TRUE
   ) +
+  geom_point(
+    data = mean_points_local_biome,
+    aes(
+      x = x_plot,
+      y = mean_cost,
+      colour = source
+    ),
+    inherit.aes = FALSE,
+    shape = 21,
+    size = 1.5,
+    fill = "black",
+    colour = "white",
+    stroke = 0.6,
+    show.legend = FALSE
+  ) +
   shadowtext::geom_shadowtext(
     data = median_labels_local_biome,
     aes(
@@ -182,20 +197,6 @@ plot_abacus_verra_local_biome <- plot_ready_local_biome %>%
     size = 2.5,
     bg.colour = "white",
     g.r = 0.2,
-    show.legend = FALSE
-  ) +
-  geom_point(
-    data = mean_points_local_biome,
-    aes(
-      x = x_plot,
-      y = mean_cost,
-      colour = source
-    ),
-    inherit.aes = FALSE,
-    shape = 8,
-    size = 0.8,
-    colour = "red",
-    stroke = 0.35,
     show.legend = FALSE
   ) +
   geom_text(
@@ -219,8 +220,8 @@ plot_abacus_verra_local_biome <- plot_ready_local_biome %>%
   ) +
   scale_colour_manual(
     values = c(
-      "Verra" = "black",
-      "ABACUS" = "gray60",
+      "Verra" = "gray60",
+      "ABACUS" = "black",
       "black" = "black",
       "gray60" = "gray60"
     ),

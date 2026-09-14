@@ -113,22 +113,6 @@ cost_strategy <- plot_data %>%
     linewidth = 0.4,
     na.rm = TRUE
   ) +
-  shadowtext::geom_shadowtext(
-    data = median_labels,
-    aes(
-      x = mitigation_strategy,
-      y = median_cost,
-      label = round(median_cost, 0),
-      group = source,
-      colour = source
-    ),
-    position = position_dodge(width = 0.75),
-    inherit.aes = FALSE,
-    size = 2.5,
-    bg.colour = "white",
-    bg.r = 0.2,
-    show.legend = FALSE
-  ) +
   geom_point(
     data = mean_points,
     aes(
@@ -138,10 +122,27 @@ cost_strategy <- plot_data %>%
     ),
     position = position_dodge(width = 0.75),
     inherit.aes = FALSE,
-    shape = 8,
-    size = 0.8,
-    colour = "red",
-    stroke = 0.35,
+    shape = 21,
+    size = 1.5,
+    fill = "black",
+    colour = "white",
+    stroke = 0.6,
+    show.legend = FALSE
+  ) +
+  shadowtext::geom_shadowtext(
+    data = median_labels,
+    aes(
+      x = mitigation_strategy,
+      y = median_cost*0.88,
+      label = round(median_cost, 0),
+      group = source,
+      colour = source
+    ),
+    position = position_dodge(width = 0.75),
+    inherit.aes = FALSE,
+    size = 2.5,
+    bg.colour = "white",
+    bg.r = 0.2,
     show.legend = FALSE
   ) +
   geom_text(
@@ -171,11 +172,11 @@ cost_strategy <- plot_data %>%
     name = ""
   ) +
   scale_colour_manual(
-    values = c("Verra" = "black", "ABACUS" = "gray60"),
+    values = c("Verra" = "gray60", "ABACUS" = "black"),
     guide = "none"
   ) +
   guides(
-    alpha = guide_legend(override.aes = list(fill = "white", colour = c("black", "gray60")))
+    alpha = guide_legend(override.aes = list(fill = "white", colour = c("gray60", "black")))
   ) +
   facet_grid(name_biome ~ yield_carbon_ratio, scales = "free") +
   theme_classic() +

@@ -48,12 +48,12 @@ fill_values <- c(
 )
 
 colour_values <- c(
-  "high-30%" = "black",
-  "high-100%" = "gray60",
-  "low-30%" = "black",
-  "low-100%" = "gray60",
-  "random-30%" = "black",
-  "random-100%" = "gray60"
+  "high-30%" = "gray60",
+  "high-100%" = "black",
+  "low-30%" = "gray60",
+  "low-100%" = "black",
+  "random-30%" = "gray60",
+  "random-100%" = "black"
 )
 
 legend_breaks <- c("high-30%", "high-100%", "low-30%", "low-100%")

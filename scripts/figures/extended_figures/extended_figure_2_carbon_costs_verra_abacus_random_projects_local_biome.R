@@ -79,7 +79,7 @@ median_labels <- plot_data %>%
   filter(!is.na(CO2_cost)) %>%
   group_by(scale, name_biome, approach, source) %>%
   summarize(median_cost = median(CO2_cost, na.rm = TRUE), .groups = "drop") %>%
-  mutate(label_colour = if_else(source == "Verra", "black", "gray60"))
+  mutate(label_colour = if_else(source == "Verra", "gray60", "black"))
 
 mean_points <- plot_data %>%
   filter(!is.na(CO2_cost)) %>%
@@ -115,6 +115,23 @@ plot_verra_abacus_local_biome <- plot_data %>%
     linewidth = 0.4,
     na.rm = TRUE
   ) +
+  geom_point(
+    data = mean_points,
+    aes(
+      x = name_biome,
+      y = mean_cost,
+      group = source,
+      colour = source
+    ),
+    position = position_dodge(width = dodge_width),
+    inherit.aes = FALSE,
+    shape = 21,
+    size = 1.5,
+    fill = "black",
+    colour = "white",
+    stroke = 0.6,
+    show.legend = FALSE
+  ) +
   shadowtext::geom_shadowtext(
     data = median_labels,
     aes(
@@ -131,22 +148,6 @@ plot_verra_abacus_local_biome <- plot_data %>%
     bg.colour = "white",
     show.legend = FALSE
   ) +
-  geom_point(
-    data = mean_points,
-    aes(
-      x = name_biome,
-      y = mean_cost,
-      group = source,
-      colour = source
-    ),
-    position = position_dodge(width = dodge_width),
-    inherit.aes = FALSE,
-    shape = 8,
-    size = 0.8,
-    colour = "red",
-    stroke = 0.35,
-    show.legend = FALSE
-  ) +
   geom_text(
     data = panel_labels,
     aes(x = name_biome, y = label_y, label = panel_label),
@@ -157,14 +158,14 @@ plot_verra_abacus_local_biome <- plot_data %>%
     size = 3
   ) +
   scale_fill_manual(
-    values = c("Verra" = "lightgray", "ABACUS" = "white"),
+    values = c("Verra" = "white", "ABACUS" = "lightgray"),
     labels = c("Verra" = "30%", "ABACUS" = "100%"),
     name = ""
   ) +
   scale_colour_manual(
     values = c(
-      "Verra" = "gray35",
-      "ABACUS" = "gray60",
+      "Verra" = "gray60",
+      "ABACUS" = "gray35",
       "black" = "black",
       "gray60" = "gray60",
       "gray50" = "gray50"

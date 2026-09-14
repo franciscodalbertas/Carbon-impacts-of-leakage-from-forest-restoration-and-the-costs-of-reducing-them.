@@ -100,11 +100,27 @@ cost_scale_abacus_verra <- plot_data %>%
     linewidth = 0.4,
     na.rm = TRUE
   ) +
+  geom_point(
+    data = mean_points,
+    aes(
+      x = leakage_scale,
+      y = mean_cost,
+      group = source
+    ),
+    position = position_dodge(width = dodge_width),
+    inherit.aes = FALSE,
+    shape = 21,
+    size = 1.5,
+    fill = "black",
+    colour = "white",
+    stroke = 0.6,
+    show.legend = FALSE
+  ) +
   shadowtext::geom_shadowtext(
     data = median_labels,
     aes(
       x = leakage_scale,
-      y = median_cost,
+      y = median_cost*0.88,
       label = round(median_cost, 0),
       group = source,
       colour = source
@@ -116,21 +132,7 @@ cost_scale_abacus_verra <- plot_data %>%
     bg.r = 0.2,
     show.legend = FALSE
   ) +
-  geom_point(
-    data = mean_points,
-    aes(
-      x = leakage_scale,
-      y = mean_cost,
-      group = source
-    ),
-    position = position_dodge(width = dodge_width),
-    inherit.aes = FALSE,
-    shape = 8,
-    size = 0.8,
-    colour = "red",
-    stroke = 0.35,
-    show.legend = FALSE
-  ) +
+  
   geom_text(
     data = panel_labels,
     aes(x = -Inf, y = Inf, label = panel_label),
@@ -145,19 +147,19 @@ cost_scale_abacus_verra <- plot_data %>%
     guide = "none"
   ) +
   scale_alpha_manual(
-    values = c("Verra" = 1, "ABACUS" = 0.45),
+    values = c("Verra" = 0.45, "ABACUS" = 1),
     breaks = c("Verra", "ABACUS"),
     labels = c("Verra" = "30%", "ABACUS" = "100%"),
     name = ""
   ) +
   scale_colour_manual(
-    values = c("Verra" = "black", "ABACUS" = "gray60"),
+    values = c("Verra" = "gray60", "ABACUS" = "black"),
     breaks = c("Verra", "ABACUS"),
     labels = c("Verra" = "30%", "ABACUS" = "100%"),
     name = ""
   ) +
   guides(
-    alpha = guide_legend(override.aes = list(fill = "white", colour = c("black", "gray60"))),
+    alpha = guide_legend(override.aes = list(fill = "white", colour = c("gray60", "black"))),
     colour = "none"
   ) +
   scale_y_continuous(trans = "log10", labels = comma) +

@@ -159,6 +159,23 @@ plot_abacus_verra_country <- plot_ready_country %>%
     linewidth = 0.4,
     na.rm = TRUE
   ) +
+  # point!
+  geom_point(
+    data = mean_points_country,
+    aes(
+      x = x_plot,
+      y = mean_cost,
+      group = source
+    ),
+    #position = position_dodge(width = dodge_width),
+    inherit.aes = FALSE,
+    shape = 21,
+    size = 1.5,
+    fill = "black",
+    colour = "white",
+    stroke = 0.6,
+    show.legend = FALSE
+  ) +
   shadowtext::geom_shadowtext(
     data = median_labels_country,
     aes(
@@ -174,20 +191,21 @@ plot_abacus_verra_country <- plot_ready_country %>%
     g.r = 0.2,
     show.legend = FALSE
   ) +
-  geom_point(
-    data = mean_points_country,
-    aes(
-      x = x_plot,
-      y = mean_cost,
-      colour = source
-    ),
-    inherit.aes = FALSE,
-    shape = 8, # before it was 95
-    size = 0.8,
-    colour = "red",
-    stroke = 0.35,
-    show.legend = FALSE
-  ) +
+  # point as red asterisk
+  # geom_point(
+  #   data = mean_points_country,
+  #   aes(
+  #     x = x_plot,
+  #     y = mean_cost,
+  #     colour = source
+  #   ),
+  #   inherit.aes = FALSE,
+  #   shape = 8, # before it was 95
+  #   size = 0.8,
+  #   colour = "red",
+  #   stroke = 0.35,
+  #   show.legend = FALSE
+  # ) +
   geom_text(
     data = panel_labels,
     aes(x = -Inf, y = Inf, label = panel_label),
@@ -209,8 +227,8 @@ plot_abacus_verra_country <- plot_ready_country %>%
   ) +
   scale_colour_manual(
     values = c(
-      "Verra" = "black",
-      "ABACUS" = "gray60",
+      "ABACUS" = "black",
+      "Verra" = "gray60",
       "black" = "black",
       "gray60" = "gray60"
     ),
@@ -243,7 +261,7 @@ plot_abacus_verra_country <- plot_ready_country %>%
   )
 
 plot_abacus_verra_country <- plot_abacus_verra_country +
-  shadowtext::geom_shadowtext(
+    shadowtext::geom_shadowtext(
     data = annotation_df_country,
     aes(x = x, y = y, label = label),
     angle = 90,

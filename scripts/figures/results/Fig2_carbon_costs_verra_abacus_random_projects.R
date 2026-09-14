@@ -102,7 +102,7 @@ median_labels_country <- plot_data %>%
   filter(!is.na(CO2_cost)) %>%
   group_by(name_biome, approach, source) %>%
   summarize(median_cost = median(CO2_cost, na.rm = TRUE), .groups = "drop") %>%
-  mutate(label_colour = if_else(source == "Verra", "black", "gray60"))
+  mutate(label_colour = if_else(source == "Verra", "gray60", "black"))
 
 mean_points_country <- plot_data %>%
   filter(!is.na(CO2_cost)) %>%
@@ -133,20 +133,38 @@ plot_verra_abacus_country <- plot_data %>%
     linewidth = 0.4,
     na.rm = TRUE
   ) +
+  # red asterisk!
+  # geom_point(
+  #   data = mean_points_country,
+  #   aes(
+  #     x = name_biome,
+  #     y = mean_cost,
+  #     group = source,
+  #     colour = source
+  #   ),
+  #   position = position_dodge(width = dodge_width),
+  #   inherit.aes = FALSE,
+  #   shape = 8,
+  #   size = 0.8,
+  #   colour = "red",
+  #   stroke = 0.35,
+  #   show.legend = FALSE
+  # ) +
+  # point!
   geom_point(
     data = mean_points_country,
     aes(
       x = name_biome,
       y = mean_cost,
-      group = source,
-      colour = source
+      group = source
     ),
     position = position_dodge(width = dodge_width),
     inherit.aes = FALSE,
-    shape = 8,
-    size = 0.8,
-    colour = "red",
-    stroke = 0.35,
+    shape = 21,
+    size = 1.5,
+    fill = "black",
+    colour = "white",
+    stroke = 0.6,
     show.legend = FALSE
   ) +
   shadowtext::geom_shadowtext(
@@ -175,14 +193,14 @@ plot_verra_abacus_country <- plot_data %>%
     size = 3
   ) +
   scale_fill_manual(
-    values = c("Verra" = "lightgray", "ABACUS" = "white"),
+    values = c("Verra" = "white" , "ABACUS" = "lightgray"),
     labels = c("Verra" = "30%", "ABACUS" = "100%"),
     name = ""
   ) +
   scale_colour_manual(
     values = c(
-      "Verra" = "gray35",
-      "ABACUS" = "gray60",
+      "Verra" = "gray60",
+      "ABACUS" = "gray35",
       "black" = "black",
       "gray60" = "gray60",
       "gray50" = "gray50"
@@ -205,6 +223,7 @@ plot_verra_abacus_country <- plot_data %>%
   theme_classic() +
   theme(
     legend.position = "top",
+    legend.box.spacing = grid::unit(0, "pt"),
     text = element_text(size = 7),
     panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
     strip.background = element_rect(colour = NA)
