@@ -274,7 +274,7 @@ plot_data$name_biome <- factor(plot_data$name_biome,levels = c("Atlantic Forest"
 facet_labels <- c(
   yield_carbon = "Forgone-production-to-carbon-gained",
   land_value_ha = "Land value",
-  rest_cost_ha = "Restoration costs"
+  rest_cost_ha = "Restoration cost"
 )
 
 # average

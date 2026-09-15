@@ -81,13 +81,6 @@ projects %>%
     .groups = "drop"
   )
 
-# A tibble: 2 × 2
-# name_biome     n_projects
-# <chr>               <int>
-#   1 Amazônia           6456
-# 2 Mata Atlântica       8602
-
-# 1000 seems like a pretty good sample!
 
 # check number of projects on the 80th percentile in each biome
 
@@ -100,16 +93,6 @@ projects %>%
     .groups = "drop"
   )
 
-# A tibble: 2 × 2
-# name_biome     n_projects
-# <chr>               <int>
-#   1 Amazônia           6456
-# 2 Mata Atlântica       8602
-
-# its roughly the same number of projects...I can then justify using a 1000
-# why using a 1000 randomly sampled to create the contrast!!
-
-# convert projects to spatial!
 
 # get coordinates
 
@@ -199,5 +182,3 @@ projects2 <- projects %>%
 
 saveRDS(projects2,"input_tables/all_projects_with_deciles.rds")
 
-# i can check how to show the variability later, perhaps add it as supp. if 
-# needed!

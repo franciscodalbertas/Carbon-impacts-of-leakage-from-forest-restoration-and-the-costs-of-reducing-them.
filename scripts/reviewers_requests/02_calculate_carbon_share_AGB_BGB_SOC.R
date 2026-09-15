@@ -243,4 +243,4 @@ saveRDS(
   file.path(output_dir, "carbon_share_AGB_BGB_SOC_by_biome_cover.rds")
 )
 
-#carbon_summary
+
