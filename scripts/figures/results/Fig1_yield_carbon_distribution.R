@@ -129,13 +129,21 @@ x_positions <- tibble(
 y_positions <- tibble(
   name_biome = c("Amazon", "Atlantic Forest"),
   y_annot_top = c(20000, 20000),
-  y_annot_bottom = c(20000 * 0.94, 20000 * 0.94)
+  # Leave enough vertical space between the mean and median labels in all panels.
+  y_annot_bottom = c(20000 * 0.80, 20000 * 0.80)
 )
 
 summ_stats <- summ_stats %>%
   left_join(x_positions, by = "name") %>%
   left_join(y_positions, by = "name_biome")
 
+# Panel letters follow reading order across the figure.
+summ_stats$panel_label <- with(summ_stats,
+  ifelse(name == "yield", ifelse(name_biome == "Atlantic Forest", "A", "C"),
+  ifelse(name == "carbon", ifelse(name_biome == "Atlantic Forest", "B", "D"),
+         ifelse(name_biome == "Atlantic Forest", "E", "F"))))
+
+# Use the same panel-top anchor and text-unit offsets for all statistics labels.
 # For the y-axis facet (name_biome)
 biome_labels <- c(
   "Amazônia" = "Amazon",
@@ -213,17 +221,23 @@ make_hist_col <- function(metric, xlim_vec) {
     
     geom_text(
       data = summ_stats %>% filter(name == metric),
-      aes(x = x_annot, y = y_annot_top,
+      aes(x = x_annot, y = Inf,
           label = paste0("Mean: ", round(mean_value, 2))),
-      color = "black", hjust = 0, vjust = 1, size = 2, inherit.aes = FALSE
+      color = "black", hjust = 0, vjust = 1.4, size = 2, inherit.aes = FALSE
     ) +
     geom_text(
       data = summ_stats %>% filter(name == metric),
-      aes(x = x_annot, y = y_annot_bottom,
+      aes(x = x_annot, y = Inf,
           label = paste0("Median: ", round(median_value, 2))),
-      color = "darkgray", hjust = 0, vjust = 1, size = 2, inherit.aes = FALSE
+      color = "darkgray", hjust = 0, vjust = 3, size = 2, inherit.aes = FALSE
     ) +
     
+    geom_text(
+      data = summ_stats %>% filter(name == metric),
+      aes(x = -Inf, y = Inf, label = panel_label),
+      hjust = -0.3, vjust = 1.2, size = 4, fontface = "bold",
+      inherit.aes = FALSE
+    ) +
     scale_y_continuous(labels = comma) +
     
     facet_grid(
@@ -340,25 +354,31 @@ hist_panel_2 <- df_l_filtered %>%
   # Text annotations
   # geom_text(data = summ_stats, aes(x = 0.001, y = y_max, 
   #                                  label = paste0("Mean: ", round(mean_value, 2))),
-  #           color = "black", hjust = 0, vjust = 1, size = 2) +
+  #           color = "black", hjust = 0, vjust = 1.4, size = 2) +
   # geom_text(data = summ_stats, aes(x = 0.001, y = y_max * 0.94, 
   #                                  label = paste0("Median: ", round(median_value, 2))),
-  #           color = "darkgray", hjust = 0, vjust = 1, size = 2) +
+  #           color = "darkgray", hjust = 0, vjust = 3, size = 2) +
   geom_text(data = summ_stats%>%
-              filter(name =="y_c_ratio"), aes(x = x_annot, y = y_annot_top, 
+              filter(name =="y_c_ratio"), aes(x = x_annot, y = Inf, 
                                               label = paste0("Mean: ", round(mean_value, 2))),
-            color = "black", hjust = 0, vjust = 1, size = 2) +
+            color = "black", hjust = 0, vjust = 1.4, size = 2) +
   geom_text(data = summ_stats%>%
-              filter(name =="y_c_ratio"), aes(x = x_annot, y = y_annot_bottom, 
+              filter(name =="y_c_ratio"), aes(x = x_annot, y = Inf, 
                                               label = paste0("Median: ", round(median_value, 2))),
-            color = "darkgray", hjust = 0, vjust = 1, size = 2)+
+            color = "darkgray", hjust = 0, vjust = 3, size = 2)+
   
   #geom_vline(data = quant_lines, aes(xintercept = q20), 
   #           color = "purple", linetype = "dotted", linewidth = 0.4) +
   #geom_vline(data = quant_lines, aes(xintercept = q80), 
   #           color = "purple", linetype = "dotted", linewidth = 0.4) +
   #scale_x_continuous(trans = "log10", labels = comma) +
-  scale_y_continuous(labels = comma) +
+  geom_text(
+      data = summ_stats %>% filter(name == "y_c_ratio"),
+      aes(x = -Inf, y = Inf, label = panel_label),
+      hjust = -0.3, vjust = 1.2, size = 4, fontface = "bold",
+      inherit.aes = FALSE
+    ) +
+    scale_y_continuous(labels = comma) +
   # facet_grid(name_biome ~ name, labeller = labeller(
   #   name_biome = as_labeller(biome_labels),
   #   name = as_labeller(name_labels,)
@@ -397,19 +417,26 @@ hist_panel_2 <- hist_panel_2 +
 
 final <- ggarrange(hist_panel_1,hist_panel_2,nrow = 2)
 
+# ggsave(
+#   "figures/Fig1.png",
+#   final,
+#   height = 15,
+#   width = 14,
+#   units = "cm",
+#   bg = "white")
+# 
+# 
+# ggsave(
+#   "figures/Fig1.svg",
+#   final,
+#   height = 15,
+#   width = 14,
+#   units = "cm",
+#   bg = "white")
+
 ggsave(
-  "figures/Fig1.png",
+  "figures/Fig1.pdf",
   final,
   height = 15,
-  width = 14,
-  units = "cm",
-  bg = "white")
-
-
-ggsave(
-  "figures/Fig1.svg",
-  final,
-  height = 15,
-  width = 14,
-  units = "cm",
-  bg = "white")
+  width = 16,
+  units = "cm")

@@ -181,9 +181,9 @@ cost_scale_abacus_verra <- plot_data %>%
 cost_scale_abacus_verra
 
 ggsave(
-  filename = "figures/Fig4_abacus_verra.png",
+  filename = "figures/Fig4_abacus_verra.pdf",
   plot = cost_scale_abacus_verra,
-  width = 14,
+  width = 16,
   height = 13,
   units = "cm"
 )

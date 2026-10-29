@@ -277,10 +277,17 @@ plot_abacus_verra_country <- plot_abacus_verra_country +
 plot_abacus_verra_country
 
 # main text
+# ggsave(
+#   filename = "figures/Fig3_abacus_verra.png",
+#   plot = plot_abacus_verra_country,
+#   width = 14,
+#   height = 12,
+#   units = "cm"
+# )
 ggsave(
-  filename = "figures/Fig3_abacus_verra.png",
+  filename = "figures/Fig3_abacus_verra.pdf",
   plot = plot_abacus_verra_country,
-  width = 14,
-  height = 12,
+  width = 16,
+  height = 13,
   units = "cm"
 )

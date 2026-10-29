@@ -185,9 +185,9 @@ plot_verra_abacus_country <- plot_data %>%
   ) +
   geom_text(
     data = panel_labels,
-    aes(x = name_biome, y = label_y, label = panel_label),
+    aes(x = -Inf, y = label_y, label = panel_label),
     inherit.aes = FALSE,
-    hjust = 5,
+    hjust = -0.5,
     vjust = 1.5,
     fontface = "bold",
     size = 3
@@ -232,10 +232,19 @@ plot_verra_abacus_country <- plot_data %>%
 plot_verra_abacus_country
 
 
+# ggsave(
+#   filename = "figures/Fig2_carbon_costs_verra_abacus_random.png",
+#   plot = plot_verra_abacus_country,
+#   width = 11,
+#   height = 8,
+#   units = "cm"
+# )
+
+
 ggsave(
-  filename = "figures/Fig2_carbon_costs_verra_abacus_random.png",
+  filename = "figures/Fig2_carbon_costs_verra_abacus_random.pdf",
   plot = plot_verra_abacus_country,
-  width = 11,
-  height = 8,
+  width = 8.8,
+  height = 6,
   units = "cm"
 )
