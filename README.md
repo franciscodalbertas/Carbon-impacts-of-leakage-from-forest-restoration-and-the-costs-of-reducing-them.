@@ -49,4 +49,8 @@ Below is a description of each script:
 - `04_a_generating_final_table_low_high_leakage.R`: aggregate results for all domains into a single table, for low- and high-leakage projects;
 - `04_b_generating_final_table_random_projects.R`: aggregate results for all domains into a single table, for the projects sampled across the full distribution;
 - `05_adjusting_currency_inflation.R`: adjust final costs converting from BRL to USD;
+- `06_generating_table_discANDleakage_sensitivity_test.R`: add a description
+- `07_generating_table_yield_proj_analysis.R`: add a description
+- `08_generating_supp_table_discount_leakage_sensitivity.R`: add a description
+
 - `figures/results`: scripts to generate the figures on the main manuscript;
