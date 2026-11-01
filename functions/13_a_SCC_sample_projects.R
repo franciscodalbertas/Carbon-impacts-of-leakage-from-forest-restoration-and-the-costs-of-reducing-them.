@@ -19,6 +19,8 @@ if (!exists("source_to_read")) source_to_read <- "both"  # Options: "verra", "ab
 #SCC <- readRDS("input_tables/SCC_rcp45.rds")
 if(!exists("SCC_rate")) {
   SCC <- readRDS("input_tables/SCC_rcp45.rds")
+  scc_file_name <- "3"
+  SCC_t0 = 133.08431
 }else{
   
   SCC <- readRDS("input_tables/SCC_rcp45_sensibility.rds")
@@ -49,151 +51,69 @@ biomass_recovery <- readRDS("input_tables/biomass_recovery.rds")
 recovery_50y <- biomass_recovery %>% filter(years == 50) %>% pull(recovery)
 biomass_recovery_base <- biomass_recovery
 
-for (i in seq_along(scale)) {
+source_options <- c("verra", "abacus")
+if (!source_to_read %in% c(source_options, "both")) {
+  stop("Invalid source_to_read specified. Choose from: 'verra', 'abacus', or 'both'.")
+}
+
+sources_to_run <- if (source_to_read == "both") source_options else source_to_read
+
+source_labels <- c(verra = "Verra", abacus = "Abacus")
+
+make_co2_name <- function(yield_carbon_ratio, name_biome) {
+  case_when(
+    yield_carbon_ratio == "min" & name_biome == "Amazônia" ~ "co2_min_AM",
+    yield_carbon_ratio == "max" & name_biome == "Amazônia" ~ "co2_max_AM",
+    yield_carbon_ratio == "min" & name_biome == "Mata Atlântica" ~ "co2_min_AF",
+    yield_carbon_ratio == "max" & name_biome == "Mata Atlântica" ~ "co2_max_AF"
+  )
+}
+
+process_source <- function(source_name, scale_name) {
+  source_label <- unname(source_labels[source_name])
+  input_path <- paste0("mitigation_inputs/inputs_for_mitigation_leakage_", source_name,
+                       "_", scale_name, "_scale_", yield_projection,
+                       "_high_low_leakge_round1.rds")
+  output_path <- paste0("mitigation_inputs/inputs_for_mitigation_leakage_", source_name,
+                        "_", scale_name, "_scale_", yield_projection,
+                        "_high_low_leakage_SCC_", scc_file_name, "_round1.rds")
   
-  # Flags for conditional processing
-  read_verra <- source_to_read %in% c("verra", "both")
-  read_abacus <- source_to_read %in% c("abacus", "both")
+  project_data <- drop_sfc_columns(readRDS(input_path))
+  project_id <- unique(project_data$coordinates)
   
-  if (read_verra) {
-    verra <- drop_sfc_columns(readRDS(paste0("mitigation_inputs/inputs_for_mitigation_leakage_verra_",
-                                             scale[i],"_scale_",yield_projection,"_high_low_leakge_round1.rds")))
+  co2_vals <- project_data %>%
+    group_by(yield_carbon_ratio, name_biome, coordinates) %>%
+    summarise(CO2_additionality = mean(CO2_additionality, na.rm = TRUE), .groups = "drop") %>%
+    mutate(name = make_co2_name(yield_carbon_ratio, name_biome))
   
-    project_id <- unique(verra$coordinates)
-    
-    }
-  if (read_abacus) {
-    abacus <- drop_sfc_columns(readRDS(paste0("mitigation_inputs/inputs_for_mitigation_leakage_abacus_",
-                                              scale[i],"_scale_",yield_projection,"_high_low_leakge_round1.rds")))
-    
-    project_id <- unique(abacus$coordinates)
-    
-    }
-  
-  #expand biomass_recovery
-  
-  biomass_recovery <- biomass_recovery_base %>%
-    crossing(coordinates = project_id) 
-  
-  
-  # === Only compute shared biomass recovery once if Verra is being used ===
-  if (read_verra) {
-    
-    co2_vals <- verra %>%
-      group_by(yield_carbon_ratio, name_biome,coordinates) %>%
-      summarise(CO2_additionality = mean(CO2_additionality, na.rm = TRUE), .groups = "drop") %>%
-      mutate(name = case_when(
-        yield_carbon_ratio == "min" & name_biome == "Amazônia" ~ "co2_min_AM",
-        yield_carbon_ratio == "max" & name_biome == "Amazônia" ~ "co2_max_AM",
-        yield_carbon_ratio == "min" & name_biome == "Mata Atlântica" ~ "co2_min_AF",
-        yield_carbon_ratio == "max" & name_biome == "Mata Atlântica" ~ "co2_max_AF"
-      ))
-    
-    
-    
-    # co2_min_AF <- verra %>% filter(yield_carbon_ratio == "min", name_biome == "Mata Atlântica") %>% pull(CO2_additionality)
-    # co2_max_AF <- verra %>% filter(yield_carbon_ratio == "max", name_biome == "Mata Atlântica") %>% pull(CO2_additionality)
-    # co2_min_AM <- verra %>% filter(yield_carbon_ratio == "min", name_biome == "Amazônia") %>% pull(CO2_additionality)
-    # co2_max_AM <- verra %>% filter(yield_carbon_ratio == "max", name_biome == "Amazônia") %>% pull(CO2_additionality)
-    
-    
-    
-  }else if(read_abacus){
-    
-    co2_vals <- abacus %>%
-      group_by(yield_carbon_ratio, name_biome,coordinates) %>%
-      summarise(CO2_additionality = mean(CO2_additionality, na.rm = TRUE), .groups = "drop") %>%
-      mutate(name = case_when(
-        yield_carbon_ratio == "min" & name_biome == "Amazônia" ~ "co2_min_AM",
-        yield_carbon_ratio == "max" & name_biome == "Amazônia" ~ "co2_max_AM",
-        yield_carbon_ratio == "min" & name_biome == "Mata Atlântica" ~ "co2_min_AF",
-        yield_carbon_ratio == "max" & name_biome == "Mata Atlântica" ~ "co2_max_AF"
-      ))
-    
-    
-    # that also depend on the project!!
-    # co2_min_AF <- abacus %>% filter(yield_carbon_ratio == "min", name_biome == "Mata Atlântica") %>% pull(CO2_additionality)
-    # co2_max_AF <- abacus %>% filter(yield_carbon_ratio == "max", name_biome == "Mata Atlântica") %>% pull(CO2_additionality)
-    # co2_min_AM <- abacus %>% filter(yield_carbon_ratio == "min", name_biome == "Amazônia") %>% pull(CO2_additionality)
-    # co2_max_AM <- abacus %>% filter(yield_carbon_ratio == "max", name_biome == "Amazônia") %>% pull(CO2_additionality)
-  
-    
-  }
-  
-  
-  # combine values with biomass recovery
-  
-  biomass_recovery <- biomass_recovery %>%
-    left_join(co2_vals)
-  
-  
-  biomass_recovery <- biomass_recovery %>%
-    mutate(
-      value = (recovery / recovery_50y) * CO2_additionality,
-      
-    )
-  
-  
-  biomass_recovery <- biomass_recovery %>%
+  biomass_recovery_source <- biomass_recovery_base %>%
+    crossing(coordinates = project_id) %>%
+    left_join(co2_vals, by = "coordinates") %>%
+    mutate(value = (recovery / recovery_50y) * CO2_additionality) %>%
     group_by(coordinates) %>%
-    mutate(Year = seq(2021, 2021 + 100, 1)) %>%
+    mutate(Year = 2021 + years) %>%
     left_join(filter(SCC, Year <= 2080), by = "Year") %>%
     filter(!is.na(SCC_t))
   
-  #biomass_recovery_l <- biomass_recovery %>% pivot_longer(3:6)
+  leakage_vals <- project_data %>%
+    ungroup() %>%
+    select(yield_carbon_ratio, name_biome, leaked_CO2, coordinates) %>%
+    mutate(
+      param = source_label,
+      name = make_co2_name(yield_carbon_ratio, name_biome),
+      years = 1,
+      Year = 2022
+    )
   
-  if (read_verra) {
-    
-    leakage_verra <- verra %>%
-      ungroup() %>%
-      select(yield_carbon_ratio, name_biome, leaked_CO2,coordinates) %>%
-      mutate(param = "Verra",
-             name = case_when(
-               yield_carbon_ratio == "min" & name_biome == "Amazônia" ~ "co2_min_AM",
-               yield_carbon_ratio == "max" & name_biome == "Amazônia" ~ "co2_max_AM",
-               yield_carbon_ratio == "min" & name_biome == "Mata Atlântica" ~ "co2_min_AF",
-               yield_carbon_ratio == "max" & name_biome == "Mata Atlântica" ~ "co2_max_AF"
-             ),
-             years = 1,
-             Year = 2022)
-    
-    biomass_recovery_verra <- biomass_recovery %>%
-      left_join(leakage_verra, by = c("name", "years", "Year","coordinates","name_biome","yield_carbon_ratio")) %>%
-      #select(-c(yield_carbon_ratio, name_biome)) %>%
-      mutate(param = "Verra",
-             leaked_CO2 = if_else(is.na(leaked_CO2), 0, leaked_CO2))
-  }
-  
-  if (read_abacus) {
-    leakage_abacus <- abacus %>%
-      ungroup() %>%
-      select(yield_carbon_ratio, name_biome, leaked_CO2,coordinates) %>%
-      mutate(param = "Abacus",
-             name = case_when(
-               yield_carbon_ratio == "min" & name_biome == "Amazônia" ~ "co2_min_AM",
-               yield_carbon_ratio == "max" & name_biome == "Amazônia" ~ "co2_max_AM",
-               yield_carbon_ratio == "min" & name_biome == "Mata Atlântica" ~ "co2_min_AF",
-               yield_carbon_ratio == "max" & name_biome == "Mata Atlântica" ~ "co2_max_AF"
-             ),
-             years = 1,
-             Year = 2022)
-    
-    biomass_recovery_abacus <- biomass_recovery %>%
-      left_join(leakage_abacus, by = c("name", "years", "Year","coordinates","name_biome","yield_carbon_ratio")) %>%
-      #select(-c(yield_carbon_ratio, name_biome)) %>%
-      mutate(param = "Abacus",
-             leaked_CO2 = if_else(is.na(leaked_CO2), 0, leaked_CO2))
-  
-    
-    }
-  
-  # Combine datasets to run unified processing
-  biomass_recovery2 <- bind_rows(
-    if (read_verra) biomass_recovery_verra else NULL,
-    if (read_abacus) biomass_recovery_abacus else NULL
-  )
-  
-  biomass_recovery2 <- biomass_recovery2 %>%
+  biomass_recovery2 <- biomass_recovery_source %>%
+    left_join(
+      leakage_vals,
+      by = c("name", "years", "Year", "coordinates", "name_biome", "yield_carbon_ratio")
+    ) %>%
+    mutate(
+      param = source_label,
+      leaked_CO2 = if_else(is.na(leaked_CO2), 0, leaked_CO2)
+    ) %>%
     arrange(years, name, param) %>%
     group_by(name, param,coordinates) %>%
     mutate(additionality = value - lag(value),
@@ -211,8 +131,6 @@ for (i in seq_along(scale)) {
       net_CO2_corrected_no_mitigation = co2_removal_corrected - co2_leaked_corrected
     )
   
-  # Summarize per group and project! sum the yearly data!
-  
   biomass_agg <- biomass_recovery2 %>%
     group_by(name, param, coordinates) %>%
     summarise(
@@ -228,27 +146,22 @@ for (i in seq_along(scale)) {
       )
     )
   
-  if (read_verra) {
-    verra_j <- left_join(verra, filter(biomass_agg, param == "Verra"), by = c("yield_carbon_ratio", "name_biome","coordinates")) %>%
-      select(-name) %>%
-      mutate(
-        net_CO2_no_correction_no_mitigation = CO2_additionality - leaked_CO2,
-        net_CO2_no_correction_mitigation = CO2_additionality
-      )
-    
-    saveRDS(verra_j, paste0("mitigation_inputs/inputs_for_mitigation_leakage_verra_",
-                             scale[i],"_scale_yield_prj_high_low_leakage_SCC_3_round1.rds"))
-  }
+  project_data_scc <- left_join(
+    project_data,
+    filter(biomass_agg, param == source_label),
+    by = c("yield_carbon_ratio", "name_biome", "coordinates")
+  ) %>%
+    select(-any_of("name")) %>%
+    mutate(
+      net_CO2_no_correction_no_mitigation = CO2_additionality - leaked_CO2,
+      net_CO2_no_correction_mitigation = CO2_additionality
+    )
   
-  if (read_abacus) {
-    abacus_j <- left_join(abacus, filter(biomass_agg, param == "Abacus"), by = c("yield_carbon_ratio", "name_biome","coordinates")) %>%
-      select(-name) %>%
-      mutate(
-        net_CO2_no_correction_no_mitigation = CO2_additionality - leaked_CO2,
-        net_CO2_no_correction_mitigation = CO2_additionality
-      )
-    
-    saveRDS(abacus_j, paste0("mitigation_inputs/inputs_for_mitigation_leakage_abacus_",
-                             scale[i],"_scale_",yield_projection,"_high_low_leakage_SCC_",scc_file_name,"_round1.rds"))
+  saveRDS(project_data_scc, output_path)
+}
+
+for (i in seq_along(scale)) {
+  for (source_name in sources_to_run) {
+    process_source(source_name, scale[i])
   }
 }
