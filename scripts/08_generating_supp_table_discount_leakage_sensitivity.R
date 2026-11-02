@@ -17,6 +17,10 @@ formatted_output_file <- file.path(
   output_dir,
   "supp_table_04_discount_leakage_sensitivity.csv"
 )
+project_output_file <- file.path(
+  output_dir,
+  "abacus_high_low_leakage_projects_country_scale_yield_prj_comparin_SCC_USD.rds"
+)
 
 mitigation_scale <- "country"
 source_params <- "Abacus"
@@ -178,6 +182,18 @@ projects <- projects %>%
     biome = factor(biome, levels = c("Atlantic Forest", "Amazon")),
     scenario = factor(scenario, levels = c("Ignoring leakage", "With mitigation"))
   )
+
+# Preserve the full mitigation project distribution for the SCC violin plot.
+# Export before filtering or summarising; the plot uses these legacy column names.
+plot_data <- projects %>%
+  filter(scenario == "With mitigation") %>%
+  mutate(
+    SCC_type = paste0("SCC_", discount_rate),
+    CO2_cost_COC = CO2_cost_USD
+  )
+
+dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+saveRDS(plot_data, project_output_file)
 
 if (positive_costs_only) {
   projects <- projects %>%
