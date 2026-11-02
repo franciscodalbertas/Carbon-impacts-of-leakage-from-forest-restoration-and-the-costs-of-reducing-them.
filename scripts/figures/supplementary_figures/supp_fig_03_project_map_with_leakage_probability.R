@@ -605,7 +605,7 @@ panel <- ggarrange(
 )
 
 ggsave(
-  filename = "figures/response_reviewers/project_map_with_leakage_probability_eunapolis.png",
+  filename = "figures/supp_figures/supp_fig_03.png",
   plot = panel,
   width = 16,
   height = 22,
