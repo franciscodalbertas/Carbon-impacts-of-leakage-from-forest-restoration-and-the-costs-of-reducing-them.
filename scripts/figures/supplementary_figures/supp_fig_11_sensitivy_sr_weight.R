@@ -11,17 +11,6 @@ library(ggridges)
 
 #-------------------------------------------------------------------------------
 
-# values for all cells withing the cluster!! For biome and country scales,
-# this is just a sample of the actual heterogeneity (as theres more single pixels
-# available!)
-
-# and the country scale is not right as there is no value outside the amazon or the 
-# atlantic forest!!
-
-# I need the full distribution of y_c ratio across pasture pixels!!
-# but then, for local scale, it only makes sense to consider the 
-# immediate regions withing the AF and AM!
-
 
 # # load yield data
 yield_w <- rast("variables/beef_yield_kg_ha_2021_albers_1km.tif")
@@ -131,11 +120,6 @@ biomes <- values_df_immediate %>%
   select(y_c_ratio_w,y_c_ratio_nw, group)
 
 
-# quantile(values_df_country$y_c_ratio_w,0.95)
-# quantile(values_df_country$y_c_ratio_w,0.05)
-# 
-# quantile(values_df_country$y_c_ratio_nw,0.95)
-# quantile(values_df_country$y_c_ratio_nw,0.05)
 
 country <- values_df_country %>%
   mutate(group = "Country") %>%
@@ -156,66 +140,6 @@ plot_data$group <- factor(plot_data$group,levels = c("Biome: AF",
                                                      "Country"))
 
 
-# # get mean values from projects in the amazon and af!
-# 
-# selected_projects <- readRDS("project_location/project_location_round8_sampled100projects.rds")
-# 
-# # get unique values
-# selected_projects <-  selected_projects %>%
-#   st_drop_geometry()%>%
-#   select(yield_carbon_ratio,name_biome,mean_y_c) %>%
-#   ungroup()%>%
-#   distinct()
-# 
-# # get mean per location
-# 
-# means <- selected_projects %>%
-#   group_by(name_biome,yield_carbon_ratio)%>%
-#   summarise(mean_y_c = mean(mean_y_c))
-# 
-# # Define line data
-# vlines_df <- data.frame(
-#   xintercept = c(means %>%filter(yield_carbon_ratio=="min"&name_biome=="Amazônia")%>%pull(mean_y_c), 
-#                  means %>%filter(yield_carbon_ratio=="min"&name_biome!="Amazônia")%>%pull(mean_y_c), 
-#                  means %>%filter(yield_carbon_ratio=="max"&name_biome=="Amazônia")%>%pull(mean_y_c), 
-#                  means %>%filter(yield_carbon_ratio=="max"&name_biome!="Amazônia")%>%pull(mean_y_c)),
-#   label = c("AM", "AF", "AM", "AF"),
-#   color = c("darkgreen", "darkgreen", "lightgreen", "lightgreen"),
-#   linetype = c("solid", "dashed", "solid", "dashed"),  # AM = solid, AF = dashed
-#   y = Inf  # To position text near the top
-# )
-# 
-# 
-# heterog_plot <- ggplot(plot_data, aes(x = y_c_ratio, y =group, fill = group)) +
-#   geom_density_ridges(scale = 1.5, alpha = 0.8, rel_min_height = 0.01, color = "white") +
-#   geom_vline(data = vlines_df, aes(xintercept = xintercept, color = color,linetype = label), size = 0.4, show.legend = T) +
-#   geom_text(data = vlines_df, aes(x = xintercept, y = y, label = label, color = color),
-#             inherit.aes = FALSE, vjust = -0.5, size = 2.5, show.legend = F) +
-#   scale_color_identity() +
-#   scale_fill_viridis_d(guide = "none")+
-#   scale_x_continuous(breaks = seq(0,12,2),
-#                      minor_breaks = seq(0, 12, 0.5))+
-#   theme_classic() +
-#   labs(
-#     #title = "Heterogeneity in Yield-to-Carbon Ratio Across Nested Spatial Scales",
-#     x = "Yield-to-Carbon Ratio (y/c)",
-#     y = "",
-#     fill = "Scale"
-#   ) +
-#   theme(
-#     legend.position = c(0.98, 0.98),
-#     legend.justification = c("right", "top"),
-#     legend.background = element_rect(fill = "white", color = NA),
-#     #legend.box.background = element_rect(color = "black"),
-#         text = element_text(size = 8)
-#         )+
-#   guides(linetype = guide_legend(title = NULL))
-#   
-# 
-# heterog_plot
-# 
-# 
-# 
 
 # now calculate the coeficient of variation for the 3 levels!
 
@@ -267,16 +191,6 @@ combined_cv_l$scale <- factor(combined_cv_l$scale,
                                 "Biome: AM",
                                 "Country")))
 
-# cv_plot <- combined_cv_l %>%
-#   filter(!is.na(scale)) %>%
-#   ggplot(aes(x = scale,y = value, fill = name))+
-#   #geom_jitter(aes(x = scale,y = value, colour = name)) +
-#   geom_boxplot(outliers = F)+
-#   ylab("cv on y/c")+
-#   xlab("scale for leakage and mitigation") +
-#   theme_classic()+
-#   theme(text = element_text(size= 8,
-#                             angle = 0))
 
 
 summary_df <- combined_cv_l %>%
