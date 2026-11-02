@@ -11,7 +11,7 @@ The analysis evaluates the carbon and cost implications of leakage from tropical
 The repository is structured as follows:
 
 - [`scripts/`](https://github.com/franciscodalbertas/Estimating-the-carbon-impacts-of-leakage-from-forest-restoration-and-the-costs-of-reducing-them/tree/main/scripts):Scripts used to run the analyses
-- [`scripts/figures/`](https://github.com/franciscodalbertas/Estimating-the-carbon-impacts-of-leakage-from-forest-restoration-and-the-costs-of-reducing-them/tree/main/scripts/figures):Scripts used to reproduce manuscript main figures
+- [`scripts/figures/`](https://github.com/franciscodalbertas/Estimating-the-carbon-impacts-of-leakage-from-forest-restoration-and-the-costs-of-reducing-them/tree/main/scripts/figures):Scripts used to reproduce manuscript figures
 - [`functions`](https://github.com/franciscodalbertas/Estimating-the-carbon-impacts-of-leakage-from-forest-restoration-and-the-costs-of-reducing-them/tree/main/functions): Custom functions that perform the necessary calculations
 - [`variables/`](https://github.com/franciscodalbertas/Estimating-the-carbon-impacts-of-leakage-from-forest-restoration-and-the-costs-of-reducing-them/tree/main/variables):Folder for input raster datasets
 - [`mitigation_inputs/`](https://github.com/franciscodalbertas/Estimating-the-carbon-impacts-of-leakage-from-forest-restoration-and-the-costs-of-reducing-them/tree/main/mitigation_inputs):Input tables with project features to run the mitigation analysis
