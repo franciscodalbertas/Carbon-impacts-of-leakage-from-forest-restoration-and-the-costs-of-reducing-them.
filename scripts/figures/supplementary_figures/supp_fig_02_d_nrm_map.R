@@ -51,7 +51,7 @@ map <- r_df %>%
   geom_sf(data = br, fill="gray",color ="black") +
   geom_raster(aes(x = x, y= y, fill = pnr))+
   scale_fill_viridis_c(
-    name = "Probability of \n natural regeneration",
+    name = "Prob.\n nat. reg.",
     #breaks = breaks
     #trans = "log"
   ) + 
@@ -79,7 +79,7 @@ map_quant <- ggplot() +
 map_quant
 
 
-ggsave("figures/supp/manuscript/pnr_map.png",
+ggsave("figures/supp_figures/supp_fig_2D.png",
        map,
        width = 16,
        height = 16,
