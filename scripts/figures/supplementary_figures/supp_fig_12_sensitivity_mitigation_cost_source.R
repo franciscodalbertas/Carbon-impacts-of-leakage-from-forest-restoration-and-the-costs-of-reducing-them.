@@ -33,7 +33,7 @@ cost_source_colours <- c(
 
 results_dir <- "results_with_mitigation"
 output_dir <- "figures/supp_figures/"
-output_file <- file.path(output_dir, "country_scale_updated.png")
+output_file <- file.path(output_dir, "supp_fig_12.png")
 
 cost_file <- function(biome, cost_source) {
   file.path(
